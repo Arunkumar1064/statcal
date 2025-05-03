@@ -1,0 +1,560 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-ruler me-2"></i>Land & Area Calculators</h1>
+        <p class="lead">Calculate field areas, convert between units, and determine land slopes for efficient planning</p>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-vector-square me-2"></i>Area Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="areaCalculatorForm">
+                    <div class="mb-3">
+                        <label for="shapeType" class="form-label">Select Shape</label>
+                        <select class="form-select" id="shapeType">
+                            <option value="rectangle">Rectangle</option>
+                            <option value="triangle">Triangle</option>
+                            <option value="circle">Circle</option>
+                            <option value="irregular">Irregular (Polygon)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Rectangle inputs -->
+                    <div id="rectangleInputs">
+                        <div class="mb-3">
+                            <label for="rectLength" class="form-label">Length (m)</label>
+                            <input type="number" class="form-control" id="rectLength" min="0" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="rectWidth" class="form-label">Width (m)</label>
+                            <input type="number" class="form-control" id="rectWidth" min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <!-- Triangle inputs -->
+                    <div id="triangleInputs" class="d-none">
+                        <div class="mb-3">
+                            <label for="triangleBase" class="form-label">Base (m)</label>
+                            <input type="number" class="form-control" id="triangleBase" min="0" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="triangleHeight" class="form-label">Height (m)</label>
+                            <input type="number" class="form-control" id="triangleHeight" min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <!-- Circle inputs -->
+                    <div id="circleInputs" class="d-none">
+                        <div class="mb-3">
+                            <label for="circleRadius" class="form-label">Radius (m)</label>
+                            <input type="number" class="form-control" id="circleRadius" min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <!-- Irregular polygon inputs -->
+                    <div id="irregularInputs" class="d-none">
+                        <p class="mb-2">Add polygon coordinates (x,y):</p>
+                        <div id="polygonCoordinates">
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <input type="number" class="form-control polygon-x" placeholder="X1" step="0.01">
+                                </div>
+                                <div class="col">
+                                    <input type="number" class="form-control polygon-y" placeholder="Y1" step="0.01">
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <input type="number" class="form-control polygon-x" placeholder="X2" step="0.01">
+                                </div>
+                                <div class="col">
+                                    <input type="number" class="form-control polygon-y" placeholder="Y2" step="0.01">
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <input type="number" class="form-control polygon-x" placeholder="X3" step="0.01">
+                                </div>
+                                <div class="col">
+                                    <input type="number" class="form-control polygon-y" placeholder="Y3" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" id="addPolygonPoint">
+                            <i class="fas fa-plus me-1"></i>Add Point
+                        </button>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="areaUnit" class="form-label">Result Unit</label>
+                        <select class="form-select" id="areaUnit">
+                            <option value="m2">Square Meters (m²)</option>
+                            <option value="ha">Hectares (ha)</option>
+                            <option value="acre">Acres</option>
+                            <option value="ft2">Square Feet (ft²)</option>
+                        </select>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateArea">Calculate Area</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="areaResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Area Result</h4>
+                        <p id="areaValue">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-exchange-alt me-2"></i>Unit Converter</h3>
+            </div>
+            <div class="card-body">
+                <form id="unitConverterForm">
+                    <div class="mb-3">
+                        <label for="fromUnit" class="form-label">From Unit</label>
+                        <select class="form-select" id="fromUnit">
+                            <option value="m2">Square Meters (m²)</option>
+                            <option value="ha">Hectares (ha)</option>
+                            <option value="acre">Acres</option>
+                            <option value="ft2">Square Feet (ft²)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="toUnit" class="form-label">To Unit</label>
+                        <select class="form-select" id="toUnit">
+                            <option value="ha">Hectares (ha)</option>
+                            <option value="acre">Acres</option>
+                            <option value="m2">Square Meters (m²)</option>
+                            <option value="ft2">Square Feet (ft²)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="valueToConvert" class="form-label">Value to Convert</label>
+                        <input type="number" class="form-control" id="valueToConvert" min="0" step="0.01">
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="convertUnits">Convert</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="conversionResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Conversion Result</h4>
+                        <p id="convertedValue">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-mountain me-2"></i>Slope/Gradient Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="slopeCalculatorForm">
+                    <div class="mb-3">
+                        <label for="slopeMethod" class="form-label">Calculation Method</label>
+                        <select class="form-select" id="slopeMethod">
+                            <option value="rise-run">Rise and Run</option>
+                            <option value="coordinates">Two Points (Coordinates)</option>
+                            <option value="degree">Degree to Percent</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Rise and Run inputs -->
+                    <div id="riseRunInputs">
+                        <div class="mb-3">
+                            <label for="rise" class="form-label">Rise (Vertical Change in m)</label>
+                            <input type="number" class="form-control" id="rise" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="run" class="form-label">Run (Horizontal Distance in m)</label>
+                            <input type="number" class="form-control" id="run" min="0.01" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <!-- Coordinates inputs -->
+                    <div id="coordinatesInputs" class="d-none">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="x1" class="form-label">X1</label>
+                                <input type="number" class="form-control" id="x1" step="0.01">
+                            </div>
+                            <div class="col">
+                                <label for="y1" class="form-label">Y1</label>
+                                <input type="number" class="form-control" id="y1" step="0.01">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="x2" class="form-label">X2</label>
+                                <input type="number" class="form-control" id="x2" step="0.01">
+                            </div>
+                            <div class="col">
+                                <label for="y2" class="form-label">Y2</label>
+                                <input type="number" class="form-control" id="y2" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Degree to Percent inputs -->
+                    <div id="degreeInputs" class="d-none">
+                        <div class="mb-3">
+                            <label for="angle" class="form-label">Angle (Degrees)</label>
+                            <input type="number" class="form-control" id="angle" min="0" max="90" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateSlope">Calculate Slope</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="slopeResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Slope Results</h4>
+                        <p>Slope percentage: <span id="slopePercentage">0</span>%</p>
+                        <p>Slope ratio: 1:<span id="slopeRatio">0</span></p>
+                        <p>Angle in degrees: <span id="slopeDegree">0</span>°</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3><i class="fas fa-info-circle me-2"></i>Tips for Land & Area Measurements</h3>
+            </div>
+            <div class="card-body">
+                <h5>Measuring Irregular Fields</h5>
+                <p>For irregular fields, divide the area into regular shapes (rectangles, triangles) and add the individual areas together for the total.</p>
+                
+                <h5>Slope Guidelines for Irrigation</h5>
+                <ul>
+                    <li><strong>0-3%:</strong> Suitable for most irrigation methods</li>
+                    <li><strong>3-5%:</strong> Suitable for sprinkler systems</li>
+                    <li><strong>5-8%:</strong> May require terracing or specialized irrigation</li>
+                    <li><strong>8-15%:</strong> Challenging for irrigation, requires special planning</li>
+                    <li><strong>15%+:</strong> Not recommended for conventional irrigation</li>
+                </ul>
+                
+                <h5>Area Unit Conversion Reference</h5>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <td>1 hectare (ha)</td>
+                            <td>= 10,000 m²</td>
+                        </tr>
+                        <tr>
+                            <td>1 acre</td>
+                            <td>= 4,046.86 m²</td>
+                        </tr>
+                        <tr>
+                            <td>1 hectare (ha)</td>
+                            <td>= 2.47105 acres</td>
+                        </tr>
+                        <tr>
+                            <td>1 square meter (m²)</td>
+                            <td>= 10.7639 square feet (ft²)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Shape selector change handler
+    const shapeType = document.getElementById('shapeType');
+    const rectangleInputs = document.getElementById('rectangleInputs');
+    const triangleInputs = document.getElementById('triangleInputs');
+    const circleInputs = document.getElementById('circleInputs');
+    const irregularInputs = document.getElementById('irregularInputs');
+    
+    shapeType.addEventListener('change', function() {
+        // Hide all input sections
+        rectangleInputs.classList.add('d-none');
+        triangleInputs.classList.add('d-none');
+        circleInputs.classList.add('d-none');
+        irregularInputs.classList.add('d-none');
+        
+        // Show the selected input section
+        switch(this.value) {
+            case 'rectangle':
+                rectangleInputs.classList.remove('d-none');
+                break;
+            case 'triangle':
+                triangleInputs.classList.remove('d-none');
+                break;
+            case 'circle':
+                circleInputs.classList.remove('d-none');
+                break;
+            case 'irregular':
+                irregularInputs.classList.remove('d-none');
+                break;
+        }
+    });
+    
+    // Add polygon point button handler
+    document.getElementById('addPolygonPoint').addEventListener('click', function() {
+        const polygonCoordinates = document.getElementById('polygonCoordinates');
+        const pointCount = polygonCoordinates.querySelectorAll('.row').length + 1;
+        
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'row mb-2';
+        rowDiv.innerHTML = `
+            <div class="col">
+                <input type="number" class="form-control polygon-x" placeholder="X${pointCount}" step="0.01">
+            </div>
+            <div class="col">
+                <input type="number" class="form-control polygon-y" placeholder="Y${pointCount}" step="0.01">
+            </div>
+        `;
+        
+        polygonCoordinates.appendChild(rowDiv);
+    });
+    
+    // Slope method change handler
+    const slopeMethod = document.getElementById('slopeMethod');
+    const riseRunInputs = document.getElementById('riseRunInputs');
+    const coordinatesInputs = document.getElementById('coordinatesInputs');
+    const degreeInputs = document.getElementById('degreeInputs');
+    
+    slopeMethod.addEventListener('change', function() {
+        // Hide all input sections
+        riseRunInputs.classList.add('d-none');
+        coordinatesInputs.classList.add('d-none');
+        degreeInputs.classList.add('d-none');
+        
+        // Show the selected input section
+        switch(this.value) {
+            case 'rise-run':
+                riseRunInputs.classList.remove('d-none');
+                break;
+            case 'coordinates':
+                coordinatesInputs.classList.remove('d-none');
+                break;
+            case 'degree':
+                degreeInputs.classList.remove('d-none');
+                break;
+        }
+    });
+    
+    // Calculate Area button handler
+    document.getElementById('calculateArea').addEventListener('click', function() {
+        const selectedShape = shapeType.value;
+        const areaUnit = document.getElementById('areaUnit').value;
+        let areaInSquareMeters = 0;
+        
+        switch(selectedShape) {
+            case 'rectangle':
+                const length = parseFloat(document.getElementById('rectLength').value);
+                const width = parseFloat(document.getElementById('rectWidth').value);
+                
+                if (isNaN(length) || isNaN(width) || length <= 0 || width <= 0) {
+                    alert('Please enter valid positive values for length and width.');
+                    return;
+                }
+                
+                areaInSquareMeters = length * width;
+                break;
+                
+            case 'triangle':
+                const base = parseFloat(document.getElementById('triangleBase').value);
+                const height = parseFloat(document.getElementById('triangleHeight').value);
+                
+                if (isNaN(base) || isNaN(height) || base <= 0 || height <= 0) {
+                    alert('Please enter valid positive values for base and height.');
+                    return;
+                }
+                
+                areaInSquareMeters = 0.5 * base * height;
+                break;
+                
+            case 'circle':
+                const radius = parseFloat(document.getElementById('circleRadius').value);
+                
+                if (isNaN(radius) || radius <= 0) {
+                    alert('Please enter a valid positive value for radius.');
+                    return;
+                }
+                
+                areaInSquareMeters = Math.PI * Math.pow(radius, 2);
+                break;
+                
+            case 'irregular':
+                const xCoords = Array.from(document.querySelectorAll('.polygon-x')).map(input => parseFloat(input.value));
+                const yCoords = Array.from(document.querySelectorAll('.polygon-y')).map(input => parseFloat(input.value));
+                
+                if (xCoords.some(isNaN) || yCoords.some(isNaN) || xCoords.length < 3) {
+                    alert('Please enter valid coordinates for at least 3 points to form a polygon.');
+                    return;
+                }
+                
+                // Calculate area using Shoelace formula (Gauss's area formula)
+                let area = 0;
+                for (let i = 0; i < xCoords.length; i++) {
+                    const j = (i + 1) % xCoords.length;
+                    area += xCoords[i] * yCoords[j];
+                    area -= yCoords[i] * xCoords[j];
+                }
+                
+                areaInSquareMeters = Math.abs(area) / 2;
+                break;
+        }
+        
+        // Convert to selected unit
+        let finalValue = areaInSquareMeters;
+        let unitLabel = 'm²';
+        
+        switch(areaUnit) {
+            case 'ha':
+                finalValue = areaInSquareMeters / 10000;
+                unitLabel = 'hectares';
+                break;
+            case 'acre':
+                finalValue = areaInSquareMeters / 4046.86;
+                unitLabel = 'acres';
+                break;
+            case 'ft2':
+                finalValue = areaInSquareMeters * 10.7639;
+                unitLabel = 'ft²';
+                break;
+        }
+        
+        // Display result
+        document.getElementById('areaValue').textContent = `${finalValue.toFixed(4)} ${unitLabel}`;
+        document.getElementById('areaResult').classList.remove('d-none');
+    });
+    
+    // Convert Units button handler
+    document.getElementById('convertUnits').addEventListener('click', function() {
+        const fromUnit = document.getElementById('fromUnit').value;
+        const toUnit = document.getElementById('toUnit').value;
+        const value = parseFloat(document.getElementById('valueToConvert').value);
+        
+        if (isNaN(value) || value < 0) {
+            alert('Please enter a valid positive value to convert.');
+            return;
+        }
+        
+        // First convert to square meters
+        let valueInSquareMeters = value;
+        switch(fromUnit) {
+            case 'ha':
+                valueInSquareMeters = value * 10000;
+                break;
+            case 'acre':
+                valueInSquareMeters = value * 4046.86;
+                break;
+            case 'ft2':
+                valueInSquareMeters = value / 10.7639;
+                break;
+        }
+        
+        // Then convert to target unit
+        let finalValue = valueInSquareMeters;
+        let unitLabel = 'm²';
+        
+        switch(toUnit) {
+            case 'ha':
+                finalValue = valueInSquareMeters / 10000;
+                unitLabel = 'hectares';
+                break;
+            case 'acre':
+                finalValue = valueInSquareMeters / 4046.86;
+                unitLabel = 'acres';
+                break;
+            case 'ft2':
+                finalValue = valueInSquareMeters * 10.7639;
+                unitLabel = 'ft²';
+                break;
+            case 'm2':
+                unitLabel = 'm²';
+                break;
+        }
+        
+        // Display result
+        document.getElementById('convertedValue').textContent = `${value} ${fromUnit === 'm2' ? 'm²' : fromUnit} = ${finalValue.toFixed(4)} ${unitLabel}`;
+        document.getElementById('conversionResult').classList.remove('d-none');
+    });
+    
+    // Calculate Slope button handler
+    document.getElementById('calculateSlope').addEventListener('click', function() {
+        const method = document.getElementById('slopeMethod').value;
+        let slopePercent = 0;
+        
+        switch(method) {
+            case 'rise-run':
+                const rise = parseFloat(document.getElementById('rise').value);
+                const run = parseFloat(document.getElementById('run').value);
+                
+                if (isNaN(rise) || isNaN(run) || run <= 0) {
+                    alert('Please enter valid values for rise and run. Run must be greater than 0.');
+                    return;
+                }
+                
+                slopePercent = (rise / run) * 100;
+                break;
+                
+            case 'coordinates':
+                const x1 = parseFloat(document.getElementById('x1').value);
+                const y1 = parseFloat(document.getElementById('y1').value);
+                const x2 = parseFloat(document.getElementById('x2').value);
+                const y2 = parseFloat(document.getElementById('y2').value);
+                
+                if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2) || x1 === x2) {
+                    alert('Please enter valid coordinates. X1 cannot equal X2.');
+                    return;
+                }
+                
+                const rise2 = y2 - y1;
+                const run2 = x2 - x1;
+                slopePercent = (rise2 / run2) * 100;
+                break;
+                
+            case 'degree':
+                const angle = parseFloat(document.getElementById('angle').value);
+                
+                if (isNaN(angle) || angle < 0 || angle > 90) {
+                    alert('Please enter a valid angle between 0 and 90 degrees.');
+                    return;
+                }
+                
+                slopePercent = Math.tan(angle * Math.PI / 180) * 100;
+                break;
+        }
+        
+        const slopeRatio = Math.abs(100 / slopePercent);
+        const slopeDegree = Math.atan(Math.abs(slopePercent) / 100) * (180 / Math.PI);
+        
+        // Display results
+        document.getElementById('slopePercentage').textContent = Math.abs(slopePercent).toFixed(2);
+        document.getElementById('slopeRatio').textContent = slopeRatio.toFixed(2);
+        document.getElementById('slopeDegree').textContent = slopeDegree.toFixed(2);
+        document.getElementById('slopeResult').classList.remove('d-none');
+    });
+});
+</script>
+{% endblock %}

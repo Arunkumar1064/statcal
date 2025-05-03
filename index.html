@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center mb-5">
+        <h1><i class="fas fa-tractor me-2"></i>Agricultural Calculators Hub</h1>
+        <p class="lead">Comprehensive calculator tools for farming and agricultural planning</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-ruler fa-3x mb-3 text-info"></i>
+                <h3 class="card-title">Land & Area</h3>
+                <p class="card-text">Field area calculations, unit conversion, and slope calculations for irrigation planning.</p>
+                <a href="/land_area" class="btn btn-secondary">Open Calculators</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-seedling fa-3x mb-3 text-success"></i>
+                <h3 class="card-title">Soil & Fertilizer</h3>
+                <p class="card-text">Soil volume, fertilizer requirements, lime application, and CEC calculations.</p>
+                <a href="/soil_fertilizer" class="btn btn-secondary">Open Calculators</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-water fa-3x mb-3 text-primary"></i>
+                <h3 class="card-title">Water & Irrigation</h3>
+                <p class="card-text">Water requirements, irrigation scheduling, and rainfall runoff estimations.</p>
+                <a href="/water_irrigation" class="btn btn-secondary">Open Calculators</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-leaf fa-3x mb-3 text-warning"></i>
+                <h3 class="card-title">Seed & Planting</h3>
+                <p class="card-text">Seed rate, plant spacing, and germination rate calculations.</p>
+                <a href="/seed_planting" class="btn btn-secondary">Open Calculators</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-balance-scale fa-3x mb-3 text-danger"></i>
+                <h3 class="card-title">Crop Yield & Profit</h3>
+                <p class="card-text">Yield prediction, harvest profit, and storage capacity calculations.</p>
+                <a href="/crop_yield" class="btn btn-secondary">Open Calculators</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-plus-circle fa-3x mb-3 text-secondary"></i>
+                <h3 class="card-title">Additional Calculators</h3>
+                <p class="card-text">Pesticide mixing, livestock feed, greenhouse, and machinery cost calculators.</p>
+                <a href="/additional" class="btn btn-secondary">Open Calculators</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title"><i class="fas fa-info-circle me-2"></i>About Agricultural Calculator</h3>
+                <p>
+                    This comprehensive agricultural calculator hub provides farmers, agronomists, and agricultural professionals with essential calculation tools to optimize farming operations. Our calculators help with precise planning, resource management, and profitability analysis.
+                </p>
+                <p>
+                    All calculators use industry-standard formulas and best practices to deliver accurate results that can be applied in real agricultural scenarios. Whether you're planning irrigation systems, calculating seed requirements, or estimating crop yields, our tools provide the information you need for informed decision-making.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

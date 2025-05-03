@@ -1,0 +1,512 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-water me-2"></i>Water & Irrigation Calculators</h1>
+        <p class="lead">Calculate water requirements, irrigation schedules, and rainfall runoff</p>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-tint me-2"></i>Water Requirement Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="waterRequirementForm">
+                    <div class="mb-3">
+                        <label for="cropWaterType" class="form-label">Crop Type</label>
+                        <select class="form-select" id="cropWaterType">
+                            <option value="corn">Corn (Maize)</option>
+                            <option value="wheat">Wheat</option>
+                            <option value="rice">Rice</option>
+                            <option value="soybeans">Soybeans</option>
+                            <option value="cotton">Cotton</option>
+                            <option value="potato">Potato</option>
+                            <option value="tomato">Tomato</option>
+                            <option value="lettuce">Lettuce</option>
+                            <option value="alfalfa">Alfalfa</option>
+                            <option value="barley">Barley</option>
+                            <option value="oats">Oats</option>
+                            <option value="sorghum">Sorghum</option>
+                            <option value="sugarcane">Sugarcane</option>
+                            <option value="sunflower">Sunflower</option>
+                            <option value="canola">Canola</option>
+                            <option value="peanuts">Peanuts</option>
+                            <option value="carrots">Carrots</option>
+                            <option value="onions">Onions</option>
+                            <option value="cabbage">Cabbage</option>
+                            <option value="broccoli">Broccoli</option>
+                            <option value="cauliflower">Cauliflower</option>
+                            <option value="spinach">Spinach</option>
+                            <option value="peppers">Peppers</option>
+                            <option value="strawberries">Strawberries</option>
+                            <option value="grapes">Grapes</option>
+                            <option value="citrus">Citrus</option>
+                            <option value="apple">Apple</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="growthStage" class="form-label">Growth Stage</label>
+                        <select class="form-select" id="growthStage">
+                            <option value="initial">Initial (planting/emergence)</option>
+                            <option value="development">Development</option>
+                            <option value="middle">Middle (flowering/fruiting)</option>
+                            <option value="late">Late (maturation/harvest)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="climateType" class="form-label">Climate Type</label>
+                        <select class="form-select" id="climateType">
+                            <option value="arid">Arid (hot & dry)</option>
+                            <option value="semiarid">Semi-arid</option>
+                            <option value="subhumid">Sub-humid</option>
+                            <option value="humid">Humid</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="fieldSizeWater" class="form-label">Field Size (ha)</label>
+                        <input type="number" class="form-control" id="fieldSizeWater" min="0.01" step="0.01">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="evapotranspiration" class="form-label">Reference Evapotranspiration (ET₀) mm/day</label>
+                        <input type="number" class="form-control" id="evapotranspiration" min="0" step="0.1" value="5">
+                        <small class="text-muted">Typical range: 1-9 mm/day depending on climate</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="effectiveRainfall" class="form-label">Effective Rainfall (mm/day)</label>
+                        <input type="number" class="form-control" id="effectiveRainfall" min="0" step="0.1" value="0">
+                        <small class="text-muted">Excludes runoff/deep percolation</small>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateWaterRequirement">Calculate Water Need</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="waterResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Water Requirement Results</h4>
+                        <p>Daily water requirement: <span id="dailyWaterNeed">0</span> m³</p>
+                        <p>Weekly water requirement: <span id="weeklyWaterNeed">0</span> m³</p>
+                        <p>Water depth needed: <span id="waterDepth">0</span> mm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-clock me-2"></i>Irrigation Scheduling Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="irrigationScheduleForm">
+                    <div class="mb-3">
+                        <label for="irrigationType" class="form-label">Irrigation System Type</label>
+                        <select class="form-select" id="irrigationType">
+                            <option value="drip">Drip Irrigation</option>
+                            <option value="sprinkler">Sprinkler System</option>
+                            <option value="center-pivot">Center Pivot</option>
+                            <option value="furrow">Furrow Irrigation</option>
+                            <option value="flood">Flood Irrigation</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="waterAmount" class="form-label">Required Water Amount (mm)</label>
+                        <input type="number" class="form-control" id="waterAmount" min="0" step="0.1">
+                        <small class="text-muted">From water requirement calculator</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="flowRate" class="form-label">System Flow Rate</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="flowRate" min="0" step="0.1">
+                            <select class="form-select" id="flowRateUnit">
+                                <option value="lph">Liters per hour (L/h)</option>
+                                <option value="lpm">Liters per minute (L/min)</option>
+                                <option value="gpm">Gallons per minute (GPM)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="coverageArea" class="form-label">Coverage Area (m²)</label>
+                        <input type="number" class="form-control" id="coverageArea" min="0" step="1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="efficiencyRate" class="form-label">System Efficiency (%)</label>
+                        <input type="number" class="form-control" id="efficiencyRate" min="0" max="100" step="1">
+                        <small class="text-muted">
+                            Typical values: Drip (90%), Sprinkler (75%), Center Pivot (80%), Furrow (60%), Flood (45%)
+                        </small>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateIrrigationSchedule">Calculate Schedule</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="irrigationResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Irrigation Schedule Results</h4>
+                        <p>Irrigation duration: <span id="irrigationDuration">0</span></p>
+                        <p>Total water required: <span id="totalWaterRequired">0</span> liters</p>
+                        <p>Irrigation efficiency: <span id="irrigationEfficiency">0</span>%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-cloud-rain me-2"></i>Rainfall Runoff Estimator</h3>
+            </div>
+            <div class="card-body">
+                <form id="runoffForm">
+                    <div class="mb-3">
+                        <label for="rainfallAmount" class="form-label">Rainfall Amount (mm)</label>
+                        <input type="number" class="form-control" id="rainfallAmount" min="0" step="0.1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="landCover" class="form-label">Land Cover/Use</label>
+                        <select class="form-select" id="landCover">
+                            <option value="cultivated">Cultivated Land</option>
+                            <option value="pasture">Pasture/Grassland</option>
+                            <option value="forest">Forested</option>
+                            <option value="fallow">Fallow</option>
+                            <option value="paved">Paved/Urban</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="soilRunoffType" class="form-label">Soil Type</label>
+                        <select class="form-select" id="soilRunoffType">
+                            <option value="sandy">Sandy (High Infiltration)</option>
+                            <option value="loam">Loam (Moderate Infiltration)</option>
+                            <option value="clay">Clay (Low Infiltration)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="slopeGradient" class="form-label">Slope Gradient (%)</label>
+                        <input type="number" class="form-control" id="slopeGradient" min="0" max="100" step="0.1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="catchmentArea" class="form-label">Catchment Area (ha)</label>
+                        <input type="number" class="form-control" id="catchmentArea" min="0.01" step="0.01">
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateRunoff">Calculate Runoff</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="runoffResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Rainfall Runoff Results</h4>
+                        <p>Runoff coefficient: <span id="runoffCoefficient">0</span></p>
+                        <p>Runoff depth: <span id="runoffDepth">0</span> mm</p>
+                        <p>Total runoff volume: <span id="runoffVolume">0</span> m³</p>
+                        <p>Infiltration depth: <span id="infiltrationDepth">0</span> mm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3><i class="fas fa-info-circle me-2"></i>Irrigation & Water Management Tips</h3>
+            </div>
+            <div class="card-body">
+                <h5>Irrigation Efficiency by System Type</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Irrigation System</th>
+                            <th>Typical Efficiency (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Drip Irrigation</td>
+                            <td>85-95%</td>
+                        </tr>
+                        <tr>
+                            <td>Center Pivot</td>
+                            <td>75-85%</td>
+                        </tr>
+                        <tr>
+                            <td>Sprinkler Systems</td>
+                            <td>70-80%</td>
+                        </tr>
+                        <tr>
+                            <td>Furrow Irrigation</td>
+                            <td>55-70%</td>
+                        </tr>
+                        <tr>
+                            <td>Flood Irrigation</td>
+                            <td>40-50%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h5 class="mt-4">Water Conservation Strategies</h5>
+                <ul>
+                    <li>Schedule irrigation early morning or late evening to reduce evaporation losses</li>
+                    <li>Use soil moisture sensors to determine when irrigation is truly needed</li>
+                    <li>Implement deficit irrigation during non-critical growth stages</li>
+                    <li>Apply mulch to reduce soil surface evaporation</li>
+                    <li>Harvest rainwater for supplemental irrigation when possible</li>
+                    <li>Maintain irrigation systems to prevent leaks and ensure uniform application</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Water Requirement Calculator Logic
+    document.getElementById('calculateWaterRequirement').addEventListener('click', function() {
+        const cropType = document.getElementById('cropWaterType').value;
+        const growthStage = document.getElementById('growthStage').value;
+        const climateType = document.getElementById('climateType').value;
+        const fieldSize = parseFloat(document.getElementById('fieldSizeWater').value);
+        const et0 = parseFloat(document.getElementById('evapotranspiration').value);
+        const effectiveRainfall = parseFloat(document.getElementById('effectiveRainfall').value);
+        
+        if (isNaN(fieldSize) || isNaN(et0) || isNaN(effectiveRainfall) || 
+            fieldSize <= 0 || et0 < 0 || effectiveRainfall < 0) {
+            alert('Please enter valid values for field size, evapotranspiration, and rainfall.');
+            return;
+        }
+        
+        // Crop coefficient (Kc) values by crop type and growth stage
+        const cropCoefficients = {
+            'corn': {
+                'initial': 0.3,
+                'development': 0.7,
+                'middle': 1.15,
+                'late': 0.7
+            },
+            'wheat': {
+                'initial': 0.3,
+                'development': 0.7,
+                'middle': 1.15,
+                'late': 0.4
+            },
+            'rice': {
+                'initial': 1.05,
+                'development': 1.2,
+                'middle': 1.3,
+                'late': 0.7
+            },
+            'soybeans': {
+                'initial': 0.4,
+                'development': 0.7,
+                'middle': 1.15,
+                'late': 0.5
+            },
+            'cotton': {
+                'initial': 0.35,
+                'development': 0.7,
+                'middle': 1.2,
+                'late': 0.6
+            },
+            'potato': {
+                'initial': 0.5,
+                'development': 0.8,
+                'middle': 1.15,
+                'late': 0.7
+            },
+            'tomato': {
+                'initial': 0.6,
+                'development': 0.85,
+                'middle': 1.15,
+                'late': 0.8
+            },
+            'lettuce': {
+                'initial': 0.7,
+                'development': 0.85,
+                'middle': 1.0,
+                'late': 0.95
+            },
+            'alfalfa': {
+                'initial': 0.4,
+                'development': 0.8,
+                'middle': 1.2,
+                'late': 1.15
+            }
+        };
+        
+        // Climate adjustment factors
+        const climateFactors = {
+            'arid': 1.2,
+            'semiarid': 1.1,
+            'subhumid': 1.0,
+            'humid': 0.9
+        };
+        
+        // Calculate crop water requirement
+        const kc = cropCoefficients[cropType][growthStage];
+        const climateFactor = climateFactors[climateType];
+        
+        // Calculate crop evapotranspiration (ETc)
+        const etc = et0 * kc * climateFactor;
+        
+        // Net irrigation requirement (mm/day)
+        const netIrrigation = Math.max(0, etc - effectiveRainfall);
+        
+        // Convert to volume (cubic meters) for field size
+        const dailyWaterVolume = (netIrrigation * fieldSize * 10); // 1 mm over 1 ha = 10 m³
+        const weeklyWaterVolume = dailyWaterVolume * 7;
+        
+        // Display results
+        document.getElementById('dailyWaterNeed').textContent = dailyWaterVolume.toFixed(2);
+        document.getElementById('weeklyWaterNeed').textContent = weeklyWaterVolume.toFixed(2);
+        document.getElementById('waterDepth').textContent = netIrrigation.toFixed(2);
+        document.getElementById('waterResult').classList.remove('d-none');
+    });
+    
+    // Irrigation Scheduling Calculator Logic
+    document.getElementById('calculateIrrigationSchedule').addEventListener('click', function() {
+        const irrigationType = document.getElementById('irrigationType').value;
+        const waterAmount = parseFloat(document.getElementById('waterAmount').value);
+        const flowRate = parseFloat(document.getElementById('flowRate').value);
+        const flowRateUnit = document.getElementById('flowRateUnit').value;
+        const coverageArea = parseFloat(document.getElementById('coverageArea').value);
+        const efficiencyRate = parseFloat(document.getElementById('efficiencyRate').value);
+        
+        if (isNaN(waterAmount) || isNaN(flowRate) || isNaN(coverageArea) || isNaN(efficiencyRate) ||
+            waterAmount <= 0 || flowRate <= 0 || coverageArea <= 0 || efficiencyRate <= 0 || efficiencyRate > 100) {
+            alert('Please enter valid positive values for all fields. Efficiency must be between 1 and 100%.');
+            return;
+        }
+        
+        // Default irrigation system efficiencies if user doesn't enter custom value
+        const defaultEfficiencies = {
+            'drip': 90,
+            'sprinkler': 75,
+            'center-pivot': 80,
+            'furrow': 60,
+            'flood': 45
+        };
+        
+        // Use default efficiency if user didn't enter one
+        const efficiency = efficiencyRate || defaultEfficiencies[irrigationType];
+        
+        // Convert flow rate to liters per hour
+        let flowRateLph = flowRate;
+        if (flowRateUnit === 'lpm') {
+            flowRateLph = flowRate * 60;
+        } else if (flowRateUnit === 'gpm') {
+            flowRateLph = flowRate * 227.12; // 1 GPM = 227.12 LPH
+        }
+        
+        // Calculate water volume needed (liters)
+        // 1 mm over 1 m² = 1 liter
+        const grossWaterAmount = (waterAmount * coverageArea) / (efficiency / 100);
+        
+        // Calculate irrigation duration (hours)
+        const durationHours = grossWaterAmount / flowRateLph;
+        
+        // Convert to hours and minutes
+        const hours = Math.floor(durationHours);
+        const minutes = Math.round((durationHours - hours) * 60);
+        
+        // Display results
+        document.getElementById('irrigationDuration').textContent = `${hours} hours and ${minutes} minutes`;
+        document.getElementById('totalWaterRequired').textContent = grossWaterAmount.toFixed(2);
+        document.getElementById('irrigationEfficiency').textContent = efficiency;
+        document.getElementById('irrigationResult').classList.remove('d-none');
+    });
+    
+    // Rainfall Runoff Estimator Logic
+    document.getElementById('calculateRunoff').addEventListener('click', function() {
+        const rainfallAmount = parseFloat(document.getElementById('rainfallAmount').value);
+        const landCover = document.getElementById('landCover').value;
+        const soilType = document.getElementById('soilRunoffType').value;
+        const slopeGradient = parseFloat(document.getElementById('slopeGradient').value);
+        const catchmentArea = parseFloat(document.getElementById('catchmentArea').value);
+        
+        if (isNaN(rainfallAmount) || isNaN(slopeGradient) || isNaN(catchmentArea) ||
+            rainfallAmount < 0 || slopeGradient < 0 || slopeGradient > 100 || catchmentArea <= 0) {
+            alert('Please enter valid values for rainfall, slope gradient (0-100%), and catchment area.');
+            return;
+        }
+        
+        // Base runoff coefficients by land cover and soil type
+        const baseRunoffCoefficients = {
+            'cultivated': {
+                'sandy': 0.2,
+                'loam': 0.4,
+                'clay': 0.5
+            },
+            'pasture': {
+                'sandy': 0.15,
+                'loam': 0.35,
+                'clay': 0.45
+            },
+            'forest': {
+                'sandy': 0.1,
+                'loam': 0.3,
+                'clay': 0.4
+            },
+            'fallow': {
+                'sandy': 0.3,
+                'loam': 0.5,
+                'clay': 0.6
+            },
+            'paved': {
+                'sandy': 0.7,
+                'loam': 0.8,
+                'clay': 0.9
+            }
+        };
+        
+        // Get base coefficient
+        let runoffCoefficient = baseRunoffCoefficients[landCover][soilType];
+        
+        // Adjust for slope (simplified)
+        if (slopeGradient > 5) {
+            // Increase coefficient for steeper slopes
+            runoffCoefficient += Math.min(0.2, (slopeGradient - 5) * 0.008);
+        }
+        
+        // Ensure coefficient doesn't exceed 0.95
+        runoffCoefficient = Math.min(0.95, runoffCoefficient);
+        
+        // Calculate runoff depth (mm)
+        const runoffDepth = rainfallAmount * runoffCoefficient;
+        
+        // Calculate infiltration depth (mm)
+        const infiltrationDepth = rainfallAmount - runoffDepth;
+        
+        // Calculate total runoff volume (m³)
+        const runoffVolume = (runoffDepth * catchmentArea * 10); // 1 mm over 1 ha = 10 m³
+        
+        // Display results
+        document.getElementById('runoffCoefficient').textContent = runoffCoefficient.toFixed(2);
+        document.getElementById('runoffDepth').textContent = runoffDepth.toFixed(2);
+        document.getElementById('runoffVolume').textContent = runoffVolume.toFixed(2);
+        document.getElementById('infiltrationDepth').textContent = infiltrationDepth.toFixed(2);
+        document.getElementById('runoffResult').classList.remove('d-none');
+    });
+});
+</script>
+{% endblock %}

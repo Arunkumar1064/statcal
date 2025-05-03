@@ -1,0 +1,539 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-seedling me-2"></i>Soil & Fertilizer Calculators</h1>
+        <p class="lead">Calculate soil volumes, fertilizer requirements, and other soil amendment needs</p>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-box me-2"></i>Soil Volume Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="soilVolumeForm">
+                    <div class="mb-3">
+                        <label for="bedShape" class="form-label">Container Shape</label>
+                        <select class="form-select" id="bedShape">
+                            <option value="rectangular">Rectangular (raised bed, planter)</option>
+                            <option value="circular">Circular (pot, round container)</option>
+                            <option value="cylindrical">Cylindrical (barrel)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Rectangular inputs -->
+                    <div id="rectangularInputs">
+                        <div class="mb-3">
+                            <label for="rectLength" class="form-label">Length (m)</label>
+                            <input type="number" class="form-control" id="rectLength" min="0" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="rectWidth" class="form-label">Width (m)</label>
+                            <input type="number" class="form-control" id="rectWidth" min="0" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="rectDepth" class="form-label">Depth (m)</label>
+                            <input type="number" class="form-control" id="rectDepth" min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <!-- Circular inputs -->
+                    <div id="circularInputs" class="d-none">
+                        <div class="mb-3">
+                            <label for="circDiameter" class="form-label">Diameter (m)</label>
+                            <input type="number" class="form-control" id="circDiameter" min="0" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="circDepth" class="form-label">Depth (m)</label>
+                            <input type="number" class="form-control" id="circDepth" min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <!-- Cylindrical inputs -->
+                    <div id="cylindricalInputs" class="d-none">
+                        <div class="mb-3">
+                            <label for="cylDiameter" class="form-label">Diameter (m)</label>
+                            <input type="number" class="form-control" id="cylDiameter" min="0" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cylHeight" class="form-label">Height (m)</label>
+                            <input type="number" class="form-control" id="cylHeight" min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="volumeUnit" class="form-label">Result Unit</label>
+                        <select class="form-select" id="volumeUnit">
+                            <option value="m3">Cubic Meters (m³)</option>
+                            <option value="l">Liters (L)</option>
+                            <option value="ft3">Cubic Feet (ft³)</option>
+                            <option value="gal">US Gallons (gal)</option>
+                        </select>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateVolume">Calculate Volume</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="volumeResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Soil Volume Result</h4>
+                        <p id="volumeValue">0</p>
+                        <p class="mt-2">This translates to approximately <span id="soilBags">0</span> standard 40L bags of soil.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-flask me-2"></i>Fertilizer Requirement Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="fertilizerForm">
+                    <div class="mb-3">
+                        <label for="cropType" class="form-label">Crop Type</label>
+                        <select class="form-select" id="cropType">
+                            <option value="corn">Corn</option>
+                            <option value="wheat">Wheat</option>
+                            <option value="soybeans">Soybeans</option>
+                            <option value="vegetables">Vegetables (general)</option>
+                            <option value="fruits">Fruits (general)</option>
+                            <option value="cotton">Cotton</option>
+                            <option value="rice">Rice</option>
+                            <option value="barley">Barley</option>
+                            <option value="oats">Oats</option>
+                            <option value="sorghum">Sorghum</option>
+                            <option value="potatoes">Potatoes</option>
+                            <option value="sugarcane">Sugarcane</option>
+                            <option value="sunflower">Sunflower</option>
+                            <option value="canola">Canola</option>
+                            <option value="peanuts">Peanuts</option>
+                            <option value="tomatoes">Tomatoes</option>
+                            <option value="alfalfa">Alfalfa</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    
+                    <div id="customNpkInputs" class="d-none">
+                        <div class="mb-3">
+                            <label for="customN" class="form-label">Required Nitrogen (N) kg/ha</label>
+                            <input type="number" class="form-control" id="customN" min="0" step="0.1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customP" class="form-label">Required Phosphorus (P) kg/ha</label>
+                            <input type="number" class="form-control" id="customP" min="0" step="0.1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customK" class="form-label">Required Potassium (K) kg/ha</label>
+                            <input type="number" class="form-control" id="customK" min="0" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="soilTestN" class="form-label">Soil Test Nitrogen (N) kg/ha</label>
+                        <input type="number" class="form-control" id="soilTestN" min="0" step="0.1" value="0">
+                        <small class="text-muted">Enter 0 if soil test not available</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="soilTestP" class="form-label">Soil Test Phosphorus (P) kg/ha</label>
+                        <input type="number" class="form-control" id="soilTestP" min="0" step="0.1" value="0">
+                        <small class="text-muted">Enter 0 if soil test not available</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="soilTestK" class="form-label">Soil Test Potassium (K) kg/ha</label>
+                        <input type="number" class="form-control" id="soilTestK" min="0" step="0.1" value="0">
+                        <small class="text-muted">Enter 0 if soil test not available</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="fieldSize" class="form-label">Field Size (ha)</label>
+                        <input type="number" class="form-control" id="fieldSize" min="0.01" step="0.01">
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateFertilizer">Calculate Requirements</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="fertilizerResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Fertilizer Requirements</h4>
+                        <p>Required Nitrogen (N): <span id="requiredN">0</span> kg</p>
+                        <p>Required Phosphorus (P): <span id="requiredP">0</span> kg</p>
+                        <p>Required Potassium (K): <span id="requiredK">0</span> kg</p>
+                        <hr>
+                        <p class="mb-0">Total NPK: <span id="totalNPK">0</span> kg</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-balance-scale me-2"></i>Lime Requirement Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="limeForm">
+                    <div class="mb-3">
+                        <label for="currentPH" class="form-label">Current Soil pH</label>
+                        <input type="number" class="form-control" id="currentPH" min="0" max="14" step="0.1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="targetPH" class="form-label">Target pH</label>
+                        <input type="number" class="form-control" id="targetPH" min="0" max="14" step="0.1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="soilType" class="form-label">Soil Type</label>
+                        <select class="form-select" id="soilType">
+                            <option value="sandy">Sandy</option>
+                            <option value="loam">Loam</option>
+                            <option value="clay">Clay</option>
+                            <option value="organic">Organic/Peat</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="limeArea" class="form-label">Area (ha)</label>
+                        <input type="number" class="form-control" id="limeArea" min="0.01" step="0.01">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="limeType" class="form-label">Lime Type</label>
+                        <select class="form-select" id="limeType">
+                            <option value="agricultural">Agricultural Limestone (CaCO₃)</option>
+                            <option value="dolomitic">Dolomitic Limestone (CaMg(CO₃)₂)</option>
+                            <option value="hydrated">Hydrated Lime (Ca(OH)₂)</option>
+                        </select>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateLime">Calculate Lime Requirement</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="limeResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Lime Requirement Result</h4>
+                        <p id="limeValue">0</p>
+                        <p class="mb-0">Apply lime evenly, ideally 2-3 months before planting.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-atom me-2"></i>Cation Exchange Capacity (CEC) Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="cecForm">
+                    <div class="alert alert-info">
+                        <small>Enter soil test results in meq/100g or convert from ppm (mg/kg)</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="calcium" class="form-label">Calcium (Ca²⁺)</label>
+                        <input type="number" class="form-control" id="calcium" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="magnesium" class="form-label">Magnesium (Mg²⁺)</label>
+                        <input type="number" class="form-control" id="magnesium" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="potassium" class="form-label">Potassium (K⁺)</label>
+                        <input type="number" class="form-control" id="potassium" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="sodium" class="form-label">Sodium (Na⁺)</label>
+                        <input type="number" class="form-control" id="sodium" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="hydrogen" class="form-label">Hydrogen (H⁺)</label>
+                        <input type="number" class="form-control" id="hydrogen" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="aluminum" class="form-label">Aluminum (Al³⁺)</label>
+                        <input type="number" class="form-control" id="aluminum" min="0" step="0.01">
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateCEC">Calculate CEC</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="cecResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">CEC Result</h4>
+                        <p>Total Cation Exchange Capacity: <span id="totalCEC">0</span> meq/100g</p>
+                        <hr>
+                        <p>Base Saturation Percentages:</p>
+                        <ul>
+                            <li>Calcium: <span id="calciumPercent">0</span>%</li>
+                            <li>Magnesium: <span id="magnesiumPercent">0</span>%</li>
+                            <li>Potassium: <span id="potassiumPercent">0</span>%</li>
+                            <li>Sodium: <span id="sodiumPercent">0</span>%</li>
+                            <li>Acidity (H⁺ + Al³⁺): <span id="acidityPercent">0</span>%</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Soil Volume Calculator Logic
+    const bedShape = document.getElementById('bedShape');
+    const rectangularInputs = document.getElementById('rectangularInputs');
+    const circularInputs = document.getElementById('circularInputs');
+    const cylindricalInputs = document.getElementById('cylindricalInputs');
+    
+    bedShape.addEventListener('change', function() {
+        // Hide all input sections
+        rectangularInputs.classList.add('d-none');
+        circularInputs.classList.add('d-none');
+        cylindricalInputs.classList.add('d-none');
+        
+        // Show the selected input section
+        switch(this.value) {
+            case 'rectangular':
+                rectangularInputs.classList.remove('d-none');
+                break;
+            case 'circular':
+                circularInputs.classList.remove('d-none');
+                break;
+            case 'cylindrical':
+                cylindricalInputs.classList.remove('d-none');
+                break;
+        }
+    });
+    
+    document.getElementById('calculateVolume').addEventListener('click', function() {
+        const shape = bedShape.value;
+        const volumeUnit = document.getElementById('volumeUnit').value;
+        let volumeInCubicMeters = 0;
+        
+        switch(shape) {
+            case 'rectangular':
+                const length = parseFloat(document.getElementById('rectLength').value);
+                const width = parseFloat(document.getElementById('rectWidth').value);
+                const depth = parseFloat(document.getElementById('rectDepth').value);
+                
+                if (isNaN(length) || isNaN(width) || isNaN(depth) || length <= 0 || width <= 0 || depth <= 0) {
+                    alert('Please enter valid positive values for all dimensions.');
+                    return;
+                }
+                
+                volumeInCubicMeters = length * width * depth;
+                break;
+                
+            case 'circular':
+                const diameter = parseFloat(document.getElementById('circDiameter').value);
+                const circDepth = parseFloat(document.getElementById('circDepth').value);
+                
+                if (isNaN(diameter) || isNaN(circDepth) || diameter <= 0 || circDepth <= 0) {
+                    alert('Please enter valid positive values for diameter and depth.');
+                    return;
+                }
+                
+                const radius = diameter / 2;
+                volumeInCubicMeters = Math.PI * Math.pow(radius, 2) * circDepth;
+                break;
+                
+            case 'cylindrical':
+                const cylDiameter = parseFloat(document.getElementById('cylDiameter').value);
+                const height = parseFloat(document.getElementById('cylHeight').value);
+                
+                if (isNaN(cylDiameter) || isNaN(height) || cylDiameter <= 0 || height <= 0) {
+                    alert('Please enter valid positive values for diameter and height.');
+                    return;
+                }
+                
+                const cylRadius = cylDiameter / 2;
+                volumeInCubicMeters = Math.PI * Math.pow(cylRadius, 2) * height;
+                break;
+        }
+        
+        // Convert to selected unit
+        let finalValue = volumeInCubicMeters;
+        let unitLabel = 'm³';
+        
+        switch(volumeUnit) {
+            case 'l':
+                finalValue = volumeInCubicMeters * 1000;
+                unitLabel = 'liters';
+                break;
+            case 'ft3':
+                finalValue = volumeInCubicMeters * 35.3147;
+                unitLabel = 'ft³';
+                break;
+            case 'gal':
+                finalValue = volumeInCubicMeters * 264.172;
+                unitLabel = 'gallons';
+                break;
+        }
+        
+        // Calculate number of standard soil bags (40L)
+        const soilBags = Math.ceil(volumeInCubicMeters * 1000 / 40);
+        
+        // Display result
+        document.getElementById('volumeValue').textContent = `${finalValue.toFixed(2)} ${unitLabel}`;
+        document.getElementById('soilBags').textContent = soilBags;
+        document.getElementById('volumeResult').classList.remove('d-none');
+    });
+    
+    // Fertilizer Requirement Calculator Logic
+    const cropType = document.getElementById('cropType');
+    const customNpkInputs = document.getElementById('customNpkInputs');
+    
+    cropType.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customNpkInputs.classList.remove('d-none');
+        } else {
+            customNpkInputs.classList.add('d-none');
+        }
+    });
+    
+    document.getElementById('calculateFertilizer').addEventListener('click', function() {
+        const selectedCrop = cropType.value;
+        const fieldSize = parseFloat(document.getElementById('fieldSize').value);
+        
+        if (isNaN(fieldSize) || fieldSize <= 0) {
+            alert('Please enter a valid field size.');
+            return;
+        }
+        
+        const soilTestN = parseFloat(document.getElementById('soilTestN').value) || 0;
+        const soilTestP = parseFloat(document.getElementById('soilTestP').value) || 0;
+        const soilTestK = parseFloat(document.getElementById('soilTestK').value) || 0;
+        
+        // NPK requirements per hectare for different crops (kg/ha)
+        const cropRequirements = {
+            'corn': {N: 180, P: 80, K: 100},
+            'wheat': {N: 120, P: 60, K: 40},
+            'soybeans': {N: 50, P: 40, K: 60},
+            'vegetables': {N: 150, P: 70, K: 120},
+            'fruits': {N: 100, P: 50, K: 150},
+            'cotton': {N: 120, P: 60, K: 90},
+            'rice': {N: 150, P: 60, K: 80},
+            'custom': {
+                N: parseFloat(document.getElementById('customN').value) || 0,
+                P: parseFloat(document.getElementById('customP').value) || 0,
+                K: parseFloat(document.getElementById('customK').value) || 0
+            }
+        };
+        
+        // Calculate requirements based on soil test and crop needs
+        const requirements = cropRequirements[selectedCrop];
+        
+        const requiredN = Math.max(0, (requirements.N - soilTestN) * fieldSize);
+        const requiredP = Math.max(0, (requirements.P - soilTestP) * fieldSize);
+        const requiredK = Math.max(0, (requirements.K - soilTestK) * fieldSize);
+        const totalNPK = requiredN + requiredP + requiredK;
+        
+        // Display results
+        document.getElementById('requiredN').textContent = requiredN.toFixed(2);
+        document.getElementById('requiredP').textContent = requiredP.toFixed(2);
+        document.getElementById('requiredK').textContent = requiredK.toFixed(2);
+        document.getElementById('totalNPK').textContent = totalNPK.toFixed(2);
+        document.getElementById('fertilizerResult').classList.remove('d-none');
+    });
+    
+    // Lime Requirement Calculator Logic
+    document.getElementById('calculateLime').addEventListener('click', function() {
+        const currentPH = parseFloat(document.getElementById('currentPH').value);
+        const targetPH = parseFloat(document.getElementById('targetPH').value);
+        const soilType = document.getElementById('soilType').value;
+        const area = parseFloat(document.getElementById('limeArea').value);
+        const limeType = document.getElementById('limeType').value;
+        
+        if (isNaN(currentPH) || isNaN(targetPH) || isNaN(area) || 
+            currentPH < 0 || currentPH > 14 || targetPH < 0 || targetPH > 14 || area <= 0) {
+            alert('Please enter valid values for pH (0-14) and area.');
+            return;
+        }
+        
+        if (currentPH >= targetPH) {
+            alert('Current pH is already equal to or higher than target pH. No lime needed.');
+            return;
+        }
+        
+        // Base lime requirement in tons per hectare to raise pH by 1 unit
+        const baseLimeRequirementPerUnit = {
+            'sandy': 2.5,
+            'loam': 3.5,
+            'clay': 4.5,
+            'organic': 6.0
+        };
+        
+        // Effectiveness factor for different lime types
+        const limeEffectiveness = {
+            'agricultural': 1.0,
+            'dolomitic': 1.1,
+            'hydrated': 1.5
+        };
+        
+        // Calculate lime requirement
+        const phDifference = targetPH - currentPH;
+        const baseLimeAmount = baseLimeRequirementPerUnit[soilType] * phDifference * area;
+        const adjustedLimeAmount = baseLimeAmount / limeEffectiveness[limeType];
+        
+        // Display result
+        document.getElementById('limeValue').textContent = `${adjustedLimeAmount.toFixed(2)} tons of ${document.getElementById('limeType').options[document.getElementById('limeType').selectedIndex].text} needed`;
+        document.getElementById('limeResult').classList.remove('d-none');
+    });
+    
+    // CEC Calculator Logic
+    document.getElementById('calculateCEC').addEventListener('click', function() {
+        const calcium = parseFloat(document.getElementById('calcium').value) || 0;
+        const magnesium = parseFloat(document.getElementById('magnesium').value) || 0;
+        const potassium = parseFloat(document.getElementById('potassium').value) || 0;
+        const sodium = parseFloat(document.getElementById('sodium').value) || 0;
+        const hydrogen = parseFloat(document.getElementById('hydrogen').value) || 0;
+        const aluminum = parseFloat(document.getElementById('aluminum').value) || 0;
+        
+        // Calculate total CEC
+        const totalCEC = calcium + magnesium + potassium + sodium + hydrogen + aluminum;
+        
+        if (totalCEC <= 0) {
+            alert('Please enter at least one cation value greater than zero.');
+            return;
+        }
+        
+        // Calculate base saturation percentages
+        const calciumPercent = (calcium / totalCEC) * 100;
+        const magnesiumPercent = (magnesium / totalCEC) * 100;
+        const potassiumPercent = (potassium / totalCEC) * 100;
+        const sodiumPercent = (sodium / totalCEC) * 100;
+        const acidityPercent = ((hydrogen + aluminum) / totalCEC) * 100;
+        
+        // Display results
+        document.getElementById('totalCEC').textContent = totalCEC.toFixed(2);
+        document.getElementById('calciumPercent').textContent = calciumPercent.toFixed(2);
+        document.getElementById('magnesiumPercent').textContent = magnesiumPercent.toFixed(2);
+        document.getElementById('potassiumPercent').textContent = potassiumPercent.toFixed(2);
+        document.getElementById('sodiumPercent').textContent = sodiumPercent.toFixed(2);
+        document.getElementById('acidityPercent').textContent = acidityPercent.toFixed(2);
+        document.getElementById('cecResult').classList.remove('d-none');
+    });
+});
+</script>
+{% endblock %}

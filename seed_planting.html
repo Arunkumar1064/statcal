@@ -1,0 +1,604 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-leaf me-2"></i>Seed & Planting Calculators</h1>
+        <p class="lead">Calculate seed rates, plant spacing, and germination rates for optimal planting</p>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-seedling me-2"></i>Seed Rate Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="seedRateForm">
+                    <div class="mb-3">
+                        <label for="calculationMethod" class="form-label">Calculation Method</label>
+                        <select class="form-select" id="calculationMethod">
+                            <option value="density">By Plant Density</option>
+                            <option value="weight">By Seed Weight</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Plant Density Inputs -->
+                    <div id="densityInputs">
+                        <div class="mb-3">
+                            <label for="targetPlants" class="form-label">Target Plant Population (plants/ha)</label>
+                            <input type="number" class="form-control" id="targetPlants" min="0" step="1000">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="seedsPerKg" class="form-label">Seeds per Kg</label>
+                            <input type="number" class="form-control" id="seedsPerKg" min="0" step="100">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="germinationRate" class="form-label">Germination Rate (%)</label>
+                            <input type="number" class="form-control" id="germinationRate" min="0" max="100" step="1" value="90">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="establishmentLoss" class="form-label">Establishment Loss (%)</label>
+                            <input type="number" class="form-control" id="establishmentLoss" min="0" max="100" step="1" value="10">
+                            <small class="text-muted">Expected seedling loss due to pests, weather, etc.</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Seed Weight Inputs -->
+                    <div id="weightInputs" class="d-none">
+                        <div class="mb-3">
+                            <label for="cropType" class="form-label">Crop Type</label>
+                            <select class="form-select" id="cropType">
+                                <option value="wheat">Wheat</option>
+                                <option value="corn">Corn (Maize)</option>
+                                <option value="rice">Rice</option>
+                                <option value="soybeans">Soybeans</option>
+                                <option value="barley">Barley</option>
+                                <option value="oats">Oats</option>
+                                <option value="rye">Rye</option>
+                                <option value="sorghum">Sorghum</option>
+                                <option value="millet">Millet</option>
+                                <option value="quinoa">Quinoa</option>
+                                <option value="buckwheat">Buckwheat</option>
+                                <option value="flax">Flax</option>
+                                <option value="canola">Canola</option>
+                                <option value="sunflower">Sunflower</option>
+                                <option value="cotton">Cotton</option>
+                                <option value="sugarcane">Sugarcane</option>
+                                <option value="sugarbeet">Sugar Beet</option>
+                                <option value="potatoes">Potatoes</option>
+                                <option value="sweetpotato">Sweet Potato</option>
+                                <option value="cassava">Cassava</option>
+                                <option value="beans">Beans</option>
+                                <option value="peas">Peas</option>
+                                <option value="lentils">Lentils</option>
+                                <option value="chickpeas">Chickpeas</option>
+                                <option value="peanuts">Peanuts</option>
+                                <option value="alfalfa">Alfalfa</option>
+                                <option value="clover">Clover</option>
+                                <option value="tomatoes">Tomatoes</option>
+                                <option value="cabbage">Cabbage</option>
+                                <option value="onions">Onions</option>
+                                <option value="carrots">Carrots</option>
+                                <option value="lettuce">Lettuce</option>
+                                <option value="spinach">Spinach</option>
+                                <option value="peppers">Peppers</option>
+                                <option value="pumpkin">Pumpkin</option>
+                                <option value="cucumber">Cucumber</option>
+                                <option value="watermelon">Watermelon</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        
+                        <div id="customSeedWeight" class="d-none mb-3">
+                            <label for="seedWeight" class="form-label">Seed Weight (kg/ha)</label>
+                            <input type="number" class="form-control" id="seedWeight" min="0" step="1">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="seedPurity" class="form-label">Seed Purity (%)</label>
+                            <input type="number" class="form-control" id="seedPurity" min="0" max="100" step="1" value="98">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="weightGerminationRate" class="form-label">Germination Rate (%)</label>
+                            <input type="number" class="form-control" id="weightGerminationRate" min="0" max="100" step="1" value="90">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="fieldSizeSeed" class="form-label">Field Size</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="fieldSizeSeed" min="0.01" step="0.01">
+                            <select class="form-select" id="fieldSizeUnit">
+                                <option value="ha">Hectares (ha)</option>
+                                <option value="acre">Acres</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateSeedRate">Calculate Seed Rate</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="seedRateResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Seed Rate Results</h4>
+                        <p>Seed required: <span id="seedRequired">0</span> kg</p>
+                        <p>Seed rate: <span id="seedRatePerHa">0</span> kg/ha</p>
+                        <p>Total seeds: <span id="totalSeeds">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-ruler me-2"></i>Plant Spacing Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="spacingForm">
+                    <div class="mb-3">
+                        <label for="spacingMethod" class="form-label">Calculation Method</label>
+                        <select class="form-select" id="spacingMethod">
+                            <option value="density-to-spacing">Density to Spacing</option>
+                            <option value="spacing-to-density">Spacing to Density</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Density to Spacing inputs -->
+                    <div id="densityToSpacingInputs">
+                        <div class="mb-3">
+                            <label for="plantDensity" class="form-label">Plant Density (plants/ha)</label>
+                            <input type="number" class="form-control" id="plantDensity" min="0" step="1000">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="rowPattern" class="form-label">Row Pattern</label>
+                            <select class="form-select" id="rowPattern">
+                                <option value="single">Single Rows</option>
+                                <option value="double">Double Rows</option>
+                                <option value="triangular">Triangular/Staggered</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Spacing to Density inputs -->
+                    <div id="spacingToDensityInputs" class="d-none">
+                        <div class="mb-3">
+                            <label for="rowSpacing" class="form-label">Row Spacing (cm)</label>
+                            <input type="number" class="form-control" id="rowSpacing" min="0" step="1">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="plantSpacing" class="form-label">Plant Spacing within Row (cm)</label>
+                            <input type="number" class="form-control" id="plantSpacing" min="0" step="1">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="patternType" class="form-label">Planting Pattern</label>
+                            <select class="form-select" id="patternType">
+                                <option value="single">Single Rows</option>
+                                <option value="double">Double Rows</option>
+                                <option value="triangular">Triangular/Staggered</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateSpacing">Calculate</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="spacingResult">
+                    <!-- For Density to Spacing -->
+                    <div id="spacingAnswers" class="alert alert-success">
+                        <h4 class="alert-heading">Plant Spacing Results</h4>
+                        <p>Row spacing: <span id="calculatedRowSpacing">0</span> cm</p>
+                        <p>Plant spacing within row: <span id="calculatedPlantSpacing">0</span> cm</p>
+                        <p>Area per plant: <span id="areaPerPlant">0</span> m²</p>
+                    </div>
+                    
+                    <!-- For Spacing to Density -->
+                    <div id="densityAnswers" class="alert alert-success d-none">
+                        <h4 class="alert-heading">Plant Density Results</h4>
+                        <p>Plants per hectare: <span id="calculatedDensity">0</span></p>
+                        <p>Plants per acre: <span id="plantsPerAcre">0</span></p>
+                        <p>Area per plant: <span id="calculatedAreaPerPlant">0</span> m²</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-percentage me-2"></i>Germination Rate Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="germinationForm">
+                    <div class="mb-3">
+                        <label for="totalSeeds" class="form-label">Total Seeds Planted</label>
+                        <input type="number" class="form-control" id="totalSeedsPlanted" min="1" step="1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="seedsGerminated" class="form-label">Seeds Germinated</label>
+                        <input type="number" class="form-control" id="seedsGerminated" min="0" step="1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="daysToGerminate" class="form-label">Days to Germination</label>
+                        <input type="number" class="form-control" id="daysToGerminate" min="1" step="1">
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateGermination">Calculate Germination Rate</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="germinationResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Germination Results</h4>
+                        <p>Germination rate: <span id="germinationPercent">0</span>%</p>
+                        <p>Germination speed: <span id="germinationSpeed">0</span> seeds per day</p>
+                        <div id="germinationQuality" class="mt-2">
+                            <p>Germination quality assessment:</p>
+                            <div class="progress">
+                                <div id="germinationProgressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <small class="text-muted" id="germinationQualityText">Assessment result will appear here.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3><i class="fas fa-info-circle me-2"></i>Planting Guidelines</h3>
+            </div>
+            <div class="card-body">
+                <h5>Recommended Seeding Rates</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Crop</th>
+                            <th>Seeding Rate (kg/ha)</th>
+                            <th>Plant Population (plants/ha)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Wheat</td>
+                            <td>80-120</td>
+                            <td>2,000,000-3,500,000</td>
+                        </tr>
+                        <tr>
+                            <td>Corn/Maize</td>
+                            <td>20-30</td>
+                            <td>60,000-90,000</td>
+                        </tr>
+                        <tr>
+                            <td>Soybeans</td>
+                            <td>60-100</td>
+                            <td>300,000-500,000</td>
+                        </tr>
+                        <tr>
+                            <td>Rice</td>
+                            <td>80-120</td>
+                            <td>3,000,000-5,000,000</td>
+                        </tr>
+                        <tr>
+                            <td>Barley</td>
+                            <td>70-110</td>
+                            <td>2,000,000-3,000,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h5 class="mt-4">Factors Affecting Seed Requirements</h5>
+                <ul>
+                    <li><strong>Germination Rate:</strong> Lower germination requires higher seeding rates</li>
+                    <li><strong>Soil Conditions:</strong> Poor soils may require more seeds</li>
+                    <li><strong>Planting Method:</strong> Broadcast seeding requires more seeds than drilling</li>
+                    <li><strong>Planting Time:</strong> Late plantings often require higher rates</li>
+                    <li><strong>Seed Size:</strong> Varies by variety and affects the number of seeds per kg</li>
+                </ul>
+                
+                <h5 class="mt-4">Germination Quality Guide</h5>
+                <ul>
+                    <li><strong>Excellent:</strong> >90% germination</li>
+                    <li><strong>Good:</strong> 75-90% germination</li>
+                    <li><strong>Fair:</strong> 60-75% germination</li>
+                    <li><strong>Poor:</strong> <60% germination - consider obtaining new seed</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Seed Rate Calculator Logic
+    const calculationMethod = document.getElementById('calculationMethod');
+    const densityInputs = document.getElementById('densityInputs');
+    const weightInputs = document.getElementById('weightInputs');
+    
+    calculationMethod.addEventListener('change', function() {
+        if (this.value === 'density') {
+            densityInputs.classList.remove('d-none');
+            weightInputs.classList.add('d-none');
+        } else {
+            densityInputs.classList.add('d-none');
+            weightInputs.classList.remove('d-none');
+        }
+    });
+    
+    const cropType = document.getElementById('cropType');
+    const customSeedWeight = document.getElementById('customSeedWeight');
+    
+    cropType.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customSeedWeight.classList.remove('d-none');
+        } else {
+            customSeedWeight.classList.add('d-none');
+        }
+    });
+    
+    document.getElementById('calculateSeedRate').addEventListener('click', function() {
+        const method = calculationMethod.value;
+        const fieldSize = parseFloat(document.getElementById('fieldSizeSeed').value);
+        const fieldUnit = document.getElementById('fieldSizeUnit').value;
+        
+        if (isNaN(fieldSize) || fieldSize <= 0) {
+            alert('Please enter a valid field size.');
+            return;
+        }
+        
+        // Convert acres to hectares if needed
+        const fieldSizeHa = fieldUnit === 'acre' ? fieldSize * 0.404686 : fieldSize;
+        
+        let seedRateKgPerHa = 0;
+        let totalSeedsNumber = 0;
+        
+        if (method === 'density') {
+            const targetPlants = parseFloat(document.getElementById('targetPlants').value);
+            const seedsPerKg = parseFloat(document.getElementById('seedsPerKg').value);
+            const germinationRate = parseFloat(document.getElementById('germinationRate').value);
+            const establishmentLoss = parseFloat(document.getElementById('establishmentLoss').value);
+            
+            if (isNaN(targetPlants) || isNaN(seedsPerKg) || isNaN(germinationRate) || isNaN(establishmentLoss) ||
+                targetPlants <= 0 || seedsPerKg <= 0 || germinationRate <= 0 || germinationRate > 100 || 
+                establishmentLoss < 0 || establishmentLoss >= 100) {
+                alert('Please enter valid values for all fields.');
+                return;
+            }
+            
+            // Calculate factor for germination rate and establishment loss
+            const factor = 100 / ((100 - establishmentLoss) * germinationRate / 100);
+            
+            // Calculate seeds needed
+            const totalSeedsNeeded = targetPlants * factor;
+            
+            // Calculate kg of seed required
+            seedRateKgPerHa = totalSeedsNeeded / seedsPerKg;
+            totalSeedsNumber = totalSeedsNeeded * fieldSizeHa;
+            
+        } else { // by weight
+            const selectedCrop = cropType.value;
+            const seedPurity = parseFloat(document.getElementById('seedPurity').value);
+            const weightGerminationRate = parseFloat(document.getElementById('weightGerminationRate').value);
+            
+            if (isNaN(seedPurity) || isNaN(weightGerminationRate) ||
+                seedPurity <= 0 || seedPurity > 100 || weightGerminationRate <= 0 || weightGerminationRate > 100) {
+                alert('Please enter valid values for seed purity and germination rate (between 1-100%).');
+                return;
+            }
+            
+            // Standard seeding rates by crop (kg/ha)
+            const standardSeedingRates = {
+                'wheat': 100,
+                'corn': 25,
+                'rice': 100,
+                'soybeans': 80,
+                'barley': 90,
+                'oats': 85,
+                'custom': parseFloat(document.getElementById('seedWeight').value) || 0
+            };
+            
+            if (selectedCrop === 'custom' && 
+                (isNaN(parseFloat(document.getElementById('seedWeight').value)) || 
+                parseFloat(document.getElementById('seedWeight').value) <= 0)) {
+                alert('Please enter a valid seed weight for custom crop.');
+                return;
+            }
+            
+            // Adjust for purity and germination
+            const adjustmentFactor = 100 / (seedPurity * weightGerminationRate / 100);
+            seedRateKgPerHa = standardSeedingRates[selectedCrop] * adjustmentFactor / 100;
+            
+            // Approximate seeds per kg for estimation
+            const approxSeedsPerKg = {
+                'wheat': 25000,
+                'corn': 3500,
+                'rice': 30000,
+                'soybeans': 6000,
+                'barley': 22000,
+                'oats': 28000,
+                'custom': 10000 // default for custom
+            };
+            
+            totalSeedsNumber = seedRateKgPerHa * fieldSizeHa * approxSeedsPerKg[selectedCrop];
+        }
+        
+        // Display results
+        document.getElementById('seedRequired').textContent = (seedRateKgPerHa * fieldSizeHa).toFixed(2);
+        document.getElementById('seedRatePerHa').textContent = seedRateKgPerHa.toFixed(2);
+        document.getElementById('totalSeeds').textContent = Math.round(totalSeedsNumber).toLocaleString();
+        document.getElementById('seedRateResult').classList.remove('d-none');
+    });
+    
+    // Plant Spacing Calculator Logic
+    const spacingMethod = document.getElementById('spacingMethod');
+    const densityToSpacingInputs = document.getElementById('densityToSpacingInputs');
+    const spacingToDensityInputs = document.getElementById('spacingToDensityInputs');
+    const spacingAnswers = document.getElementById('spacingAnswers');
+    const densityAnswers = document.getElementById('densityAnswers');
+    
+    spacingMethod.addEventListener('change', function() {
+        if (this.value === 'density-to-spacing') {
+            densityToSpacingInputs.classList.remove('d-none');
+            spacingToDensityInputs.classList.add('d-none');
+            spacingAnswers.classList.remove('d-none');
+            densityAnswers.classList.add('d-none');
+        } else {
+            densityToSpacingInputs.classList.add('d-none');
+            spacingToDensityInputs.classList.remove('d-none');
+            spacingAnswers.classList.add('d-none');
+            densityAnswers.classList.remove('d-none');
+        }
+    });
+    
+    document.getElementById('calculateSpacing').addEventListener('click', function() {
+        const method = spacingMethod.value;
+        
+        if (method === 'density-to-spacing') {
+            const plantDensity = parseFloat(document.getElementById('plantDensity').value);
+            const rowPattern = document.getElementById('rowPattern').value;
+            
+            if (isNaN(plantDensity) || plantDensity <= 0) {
+                alert('Please enter a valid plant density.');
+                return;
+            }
+            
+            // Calculate area per plant in square meters
+            const areaPerPlant = 10000 / plantDensity; // 1 ha = 10,000 m²
+            
+            // Calculate spacing based on pattern
+            let rowSpacing, plantSpacing;
+            
+            switch(rowPattern) {
+                case 'single':
+                    // For single rows, we use a square or near-square layout
+                    rowSpacing = Math.sqrt(areaPerPlant) * 100; // convert to cm
+                    plantSpacing = rowSpacing;
+                    break;
+                    
+                case 'double':
+                    // For double rows, row spacing is typically 1.5x plant spacing
+                    plantSpacing = Math.sqrt(areaPerPlant / 1.5) * 100;
+                    rowSpacing = plantSpacing * 1.5;
+                    break;
+                    
+                case 'triangular':
+                    // For triangular pattern (hexagonal packing)
+                    plantSpacing = Math.sqrt((2 * areaPerPlant) / Math.sqrt(3)) * 100;
+                    rowSpacing = (Math.sqrt(3) / 2) * plantSpacing;
+                    break;
+            }
+            
+            // Display results
+            document.getElementById('calculatedRowSpacing').textContent = rowSpacing.toFixed(1);
+            document.getElementById('calculatedPlantSpacing').textContent = plantSpacing.toFixed(1);
+            document.getElementById('areaPerPlant').textContent = areaPerPlant.toFixed(3);
+            document.getElementById('spacingResult').classList.remove('d-none');
+            
+        } else { // spacing-to-density
+            const rowSpacing = parseFloat(document.getElementById('rowSpacing').value);
+            const plantSpacing = parseFloat(document.getElementById('plantSpacing').value);
+            const patternType = document.getElementById('patternType').value;
+            
+            if (isNaN(rowSpacing) || isNaN(plantSpacing) || rowSpacing <= 0 || plantSpacing <= 0) {
+                alert('Please enter valid spacing values.');
+                return;
+            }
+            
+            // Calculate area per plant in square meters
+            let areaPerPlant;
+            let plantsPerHa;
+            
+            switch(patternType) {
+                case 'single':
+                    areaPerPlant = (rowSpacing * plantSpacing) / 10000; // convert cm² to m²
+                    break;
+                    
+                case 'double':
+                    // For double rows, effective area is about 0.75x the product of spacings
+                    areaPerPlant = (rowSpacing * plantSpacing * 0.75) / 10000;
+                    break;
+                    
+                case 'triangular':
+                    // For triangular pattern (hexagonal packing)
+                    areaPerPlant = (rowSpacing * plantSpacing * 0.866) / 10000; // 0.866 = sin(60°)
+                    break;
+            }
+            
+            plantsPerHa = 10000 / areaPerPlant; // 1 ha = 10,000 m²
+            const plantsPerAcre = plantsPerHa * 0.404686; // 1 acre = 0.404686 ha
+            
+            // Display results
+            document.getElementById('calculatedDensity').textContent = Math.round(plantsPerHa).toLocaleString();
+            document.getElementById('plantsPerAcre').textContent = Math.round(plantsPerAcre).toLocaleString();
+            document.getElementById('calculatedAreaPerPlant').textContent = areaPerPlant.toFixed(3);
+            document.getElementById('spacingResult').classList.remove('d-none');
+        }
+    });
+    
+    // Germination Rate Calculator Logic
+    document.getElementById('calculateGermination').addEventListener('click', function() {
+        const totalSeeds = parseInt(document.getElementById('totalSeedsPlanted').value);
+        const seedsGerminated = parseInt(document.getElementById('seedsGerminated').value);
+        const daysToGerminate = parseInt(document.getElementById('daysToGerminate').value);
+        
+        if (isNaN(totalSeeds) || isNaN(seedsGerminated) || isNaN(daysToGerminate) || 
+            totalSeeds <= 0 || seedsGerminated < 0 || seedsGerminated > totalSeeds || daysToGerminate <= 0) {
+            alert('Please enter valid values. Total seeds must be positive, seeds germinated must be between 0 and total seeds, and days must be positive.');
+            return;
+        }
+        
+        // Calculate germination percentage
+        const germinationRate = (seedsGerminated / totalSeeds) * 100;
+        
+        // Calculate germination speed (seeds per day)
+        const germinationSpeed = seedsGerminated / daysToGerminate;
+        
+        // Determine quality assessment
+        let qualityText, progressBarClass;
+        
+        if (germinationRate >= 90) {
+            qualityText = "Excellent germination rate. These seeds are of high quality.";
+            progressBarClass = "bg-success";
+        } else if (germinationRate >= 75) {
+            qualityText = "Good germination rate. Suitable for planting with minor rate adjustments.";
+            progressBarClass = "bg-info";
+        } else if (germinationRate >= 60) {
+            qualityText = "Fair germination rate. Consider increasing seeding rate by 15-25%.";
+            progressBarClass = "bg-warning";
+        } else {
+            qualityText = "Poor germination rate. Consider obtaining new seed or increasing seeding rate substantially.";
+            progressBarClass = "bg-danger";
+        }
+        
+        // Update progress bar
+        const progressBar = document.getElementById('germinationProgressBar');
+        progressBar.style.width = `${germinationRate}%`;
+        progressBar.className = `progress-bar ${progressBarClass}`;
+        
+        // Display results
+        document.getElementById('germinationPercent').textContent = germinationRate.toFixed(1);
+        document.getElementById('germinationSpeed').textContent = germinationSpeed.toFixed(2);
+        document.getElementById('germinationQualityText').textContent = qualityText;
+        document.getElementById('germinationResult').classList.remove('d-none');
+    });
+});
+</script>
+{% endblock %}

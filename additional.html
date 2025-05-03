@@ -1,0 +1,979 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-plus-circle me-2"></i>Additional Agricultural Calculators</h1>
+        <p class="lead">Specialized calculators for pesticide mixing, livestock feed, greenhouse management, and machinery costs</p>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-spray-can me-2"></i>Pesticide Mixing Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="pesticideMixingForm">
+                    <div class="mb-3">
+                        <label for="mixingMethod" class="form-label">Calculation Method</label>
+                        <select class="form-select" id="mixingMethod">
+                            <option value="rate-area">Application Rate & Area</option>
+                            <option value="concentration">Target Concentration</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Rate & Area inputs -->
+                    <div id="rateAreaInputs">
+                        <div class="mb-3">
+                            <label for="applicationRate" class="form-label">Application Rate</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="applicationRate" min="0" step="0.01">
+                                <select class="form-select" id="rateUnit">
+                                    <option value="l_ha">L/ha</option>
+                                    <option value="ml_ha">ml/ha</option>
+                                    <option value="kg_ha">kg/ha</option>
+                                    <option value="g_ha">g/ha</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="fieldSizePesticide" class="form-label">Area to Treat</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="fieldSizePesticide" min="0" step="0.01">
+                                <select class="form-select" id="areaUnit">
+                                    <option value="ha">hectares (ha)</option>
+                                    <option value="m2">square meters (m²)</option>
+                                    <option value="acre">acres</option>
+                                    <option value="ft2">square feet (ft²)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Concentration inputs -->
+                    <div id="concentrationInputs" class="d-none">
+                        <div class="mb-3">
+                            <label for="targetConcentration" class="form-label">Target Concentration</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="targetConcentration" min="0" step="0.01">
+                                <select class="form-select" id="concentrationUnit">
+                                    <option value="percent">Percent (%)</option>
+                                    <option value="ppm">Parts Per Million (ppm)</option>
+                                    <option value="g_l">g/L</option>
+                                    <option value="ml_l">ml/L</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="productConcentration" class="form-label">Product Concentration</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="productConcentration" min="0" max="100" step="0.1">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="text-muted">Active ingredient concentration in product</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="totalSolutionVolume" class="form-label">Total Solution Volume</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="totalSolutionVolume" min="0" step="0.1">
+                                <select class="form-select" id="volumeUnit">
+                                    <option value="l">Liters (L)</option>
+                                    <option value="gal">Gallons (gal)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="sprayingVolume" class="form-label">Sprayer Application Rate</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="sprayingVolume" min="0" step="1">
+                            <span class="input-group-text">L/ha</span>
+                        </div>
+                        <small class="text-muted">Volume of water/solution applied per hectare</small>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculatePesticide">Calculate Mix</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="pesticideResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Pesticide Mixing Results</h4>
+                        <p>Product required: <span id="productAmount">0</span></p>
+                        <p>Water/Carrier required: <span id="waterAmount">0</span></p>
+                        <p>Total spray solution: <span id="totalSprayAmount">0</span></p>
+                        <p>Number of tank loads: <span id="tankLoads">0</span></p>
+                        
+                        <div class="mt-3 alert alert-warning">
+                            <strong>Safety Note:</strong> Always read and follow the pesticide label instructions. Wear appropriate personal protective equipment when mixing and applying pesticides.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-drumstick-bite me-2"></i>Livestock Feed Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="livestockFeedForm">
+                    <div class="mb-3">
+                        <label for="animalType" class="form-label">Animal Type</label>
+                        <select class="form-select" id="animalType">
+                            <option value="dairy-cow">Dairy Cow</option>
+                            <option value="beef-cattle">Beef Cattle</option>
+                            <option value="sheep">Sheep</option>
+                            <option value="goat">Goat</option>
+                            <option value="pig">Pig</option>
+                            <option value="poultry">Poultry (Chicken)</option>
+                            <option value="horse">Horse</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    
+                    <div id="customAnimalInputs" class="d-none mb-3">
+                        <label for="customDMIPercentage" class="form-label">Daily Dry Matter Intake (% of body weight)</label>
+                        <input type="number" class="form-control" id="customDMIPercentage" min="0" max="10" step="0.1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="animalWeight" class="form-label">Average Weight per Animal</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="animalWeight" min="0" step="0.1">
+                            <select class="form-select" id="weightUnit">
+                                <option value="kg">kg</option>
+                                <option value="lb">lb</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="animalCount" class="form-label">Number of Animals</label>
+                        <input type="number" class="form-control" id="animalCount" min="1" step="1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="productionStage" class="form-label">Production Stage</label>
+                        <select class="form-select" id="productionStage">
+                            <option value="maintenance">Maintenance/Dry</option>
+                            <option value="growth">Growth/Development</option>
+                            <option value="late-pregnancy">Late Pregnancy</option>
+                            <option value="early-lactation">Early Lactation</option>
+                            <option value="peak-production">Peak Production</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="feedingPeriod" class="form-label">Feeding Period</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="feedingPeriod" min="1" step="1" value="30">
+                            <span class="input-group-text">days</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="feedMoisture" class="form-label">Average Feed Moisture Content (%)</label>
+                        <input type="number" class="form-control" id="feedMoisture" min="0" max="100" step="1" value="12">
+                        <small class="text-muted">Typical ranges: Hay (10-15%), Silage (60-70%), Grain (10-14%)</small>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateFeed">Calculate Feed Requirements</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="feedResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Livestock Feed Results</h4>
+                        <p>Daily feed per animal (as-fed): <span id="dailyFeedPerAnimal">0</span> kg</p>
+                        <p>Daily feed for all animals: <span id="dailyFeedTotal">0</span> kg</p>
+                        <p>Feed required for entire period: <span id="totalFeedRequired">0</span> kg</p>
+                        <p>Dry matter required per day: <span id="dryMatterPerDay">0</span> kg</p>
+                        <hr>
+                        <p>Approximate crude protein needed: <span id="proteinNeeded">0</span> kg/day</p>
+                        <p>Approximate energy needed: <span id="energyNeeded">0</span> MJ/day</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-temperature-high me-2"></i>Greenhouse Heating/Cooling Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="greenhouseForm">
+                    <div class="mb-3">
+                        <label for="calculationType" class="form-label">Calculation Type</label>
+                        <select class="form-select" id="calculationType">
+                            <option value="heating">Heating Requirement</option>
+                            <option value="cooling">Cooling Requirement</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="greenhouseLength" class="form-label">Greenhouse Length</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="greenhouseLength" min="1" step="0.1">
+                            <select class="form-select" id="lengthUnit">
+                                <option value="m">meters (m)</option>
+                                <option value="ft">feet (ft)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="greenhouseWidth" class="form-label">Greenhouse Width</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="greenhouseWidth" min="1" step="0.1">
+                            <select class="form-select" id="widthUnit">
+                                <option value="m">meters (m)</option>
+                                <option value="ft">feet (ft)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="sidewallHeight" class="form-label">Sidewall Height</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="sidewallHeight" min="1" step="0.1">
+                            <select class="form-select" id="heightUnit">
+                                <option value="m">meters (m)</option>
+                                <option value="ft">feet (ft)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="roofType" class="form-label">Roof Type</label>
+                        <select class="form-select" id="roofType">
+                            <option value="gothic">Gothic/Peaked</option>
+                            <option value="quonset">Quonset/Rounded</option>
+                            <option value="flat">Flat</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="coveringType" class="form-label">Covering Material</label>
+                        <select class="form-select" id="coveringType">
+                            <option value="single-poly">Single Layer Polyethylene</option>
+                            <option value="double-poly">Double Layer Polyethylene</option>
+                            <option value="polycarbonate">Polycarbonate Panels</option>
+                            <option value="glass">Glass</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="insideTemp" class="form-label">Desired Inside Temperature</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="insideTemp" min="-20" max="50" step="0.1">
+                            <select class="form-select" id="tempUnit">
+                                <option value="c">°C</option>
+                                <option value="f">°F</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="outsideTemp" class="form-label">Outside Design Temperature</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="outsideTemp" min="-40" max="50" step="0.1">
+                            <select class="form-select" id="outsideTempUnit">
+                                <option value="c">°C</option>
+                                <option value="f">°F</option>
+                            </select>
+                        </div>
+                        <small class="text-muted">For heating: minimum outside temperature. For cooling: maximum outside temperature.</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="windSpeed" class="form-label">Average Wind Speed</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="windSpeed" min="0" step="0.1" value="15">
+                            <select class="form-select" id="windUnit">
+                                <option value="kmh">km/h</option>
+                                <option value="mph">mph</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateGreenhouse">Calculate Requirements</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="greenhouseResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading" id="greenhouseResultTitle">Greenhouse Heating Results</h4>
+                        <p>Greenhouse surface area: <span id="surfaceArea">0</span> m²</p>
+                        <p>Greenhouse volume: <span id="greenhouseVolume">0</span> m³</p>
+                        <p id="heatingRequirementRow">Heating requirement: <span id="heatingRequirement">0</span> kW</p>
+                        <p id="coolingRequirementRow" class="d-none">Cooling requirement: <span id="coolingRequirement">0</span> kW</p>
+                        <p id="btuRequirementRow">BTU requirement: <span id="btuRequirement">0</span> BTU/hr</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-tractor me-2"></i>Farm Machinery Cost Calculator</h3>
+            </div>
+            <div class="card-body">
+                <form id="machineryForm">
+                    <div class="mb-3">
+                        <label for="machineType" class="form-label">Machine Type</label>
+                        <select class="form-select" id="machineType">
+                            <option value="tractor">Tractor</option>
+                            <option value="combine">Combine Harvester</option>
+                            <option value="sprayer">Sprayer</option>
+                            <option value="planter">Planter/Seeder</option>
+                            <option value="tillage">Tillage Equipment</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="purchasePrice" class="form-label">Purchase Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="purchasePrice" min="0" step="100">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="salvageValue" class="form-label">Estimated Salvage Value</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="salvageValue" min="0" step="100">
+                            <span class="input-group-text">OR</span>
+                            <input type="number" class="form-control" id="salvagePercent" min="0" max="100" step="1" value="30">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <small class="text-muted">Enter either a fixed value or a percentage of purchase price</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="usefulLife" class="form-label">Useful Life</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="usefulLife" min="1" step="1">
+                            <span class="input-group-text">years</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="annualUsage" class="form-label">Annual Usage</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="annualUsage" min="1" step="1">
+                            <span class="input-group-text">hours</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="interestRate" class="form-label">Interest Rate</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="interestRate" min="0" max="100" step="0.1" value="5">
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="fuelConsumption" class="form-label">Fuel Consumption</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="fuelConsumption" min="0" step="0.1">
+                            <span class="input-group-text">L/hr</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="fuelPrice" class="form-label">Fuel Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="fuelPrice" min="0" step="0.01">
+                            <span class="input-group-text">per liter</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="maintenancePercent" class="form-label">Annual Maintenance</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="maintenancePercent" min="0" max="100" step="0.1" value="2">
+                            <span class="input-group-text">% of purchase price</span>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="calculateMachinery">Calculate Costs</button>
+                </form>
+                
+                <div class="mt-4 d-none" id="machineryResult">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Machinery Cost Results</h4>
+                        <h5>Fixed Costs (Annual)</h5>
+                        <p>Depreciation: $<span id="depreciationCost">0</span></p>
+                        <p>Interest: $<span id="interestCost">0</span></p>
+                        <p>Total Fixed Costs: $<span id="totalFixedCosts">0</span></p>
+                        
+                        <h5 class="mt-3">Variable Costs (Annual)</h5>
+                        <p>Fuel: $<span id="fuelCost">0</span></p>
+                        <p>Maintenance & Repairs: $<span id="maintenanceCost">0</span></p>
+                        <p>Total Variable Costs: $<span id="totalVariableCosts">0</span></p>
+                        
+                        <h5 class="mt-3">Total Costs</h5>
+                        <p>Annual Total: $<span id="annualTotalCost">0</span></p>
+                        <p>Cost per Hour: $<span id="hourlyRate">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pesticide Mixing Calculator Logic
+    const mixingMethod = document.getElementById('mixingMethod');
+    const rateAreaInputs = document.getElementById('rateAreaInputs');
+    const concentrationInputs = document.getElementById('concentrationInputs');
+    
+    mixingMethod.addEventListener('change', function() {
+        if (this.value === 'rate-area') {
+            rateAreaInputs.classList.remove('d-none');
+            concentrationInputs.classList.add('d-none');
+        } else {
+            rateAreaInputs.classList.add('d-none');
+            concentrationInputs.classList.remove('d-none');
+        }
+    });
+    
+    document.getElementById('calculatePesticide').addEventListener('click', function() {
+        const method = mixingMethod.value;
+        let productAmount = 0;
+        let waterAmount = 0;
+        
+        if (method === 'rate-area') {
+            const applicationRate = parseFloat(document.getElementById('applicationRate').value);
+            const rateUnit = document.getElementById('rateUnit').value;
+            const fieldSize = parseFloat(document.getElementById('fieldSizePesticide').value);
+            const areaUnit = document.getElementById('areaUnit').value;
+            const sprayingVolume = parseFloat(document.getElementById('sprayingVolume').value);
+            
+            if (isNaN(applicationRate) || isNaN(fieldSize) || isNaN(sprayingVolume) || 
+                applicationRate <= 0 || fieldSize <= 0 || sprayingVolume <= 0) {
+                alert('Please enter valid positive values for all fields.');
+                return;
+            }
+            
+            // Convert field size to hectares
+            let fieldSizeHa = fieldSize;
+            switch (areaUnit) {
+                case 'm2':
+                    fieldSizeHa = fieldSize / 10000; // 1 ha = 10,000 m²
+                    break;
+                case 'acre':
+                    fieldSizeHa = fieldSize * 0.404686; // 1 acre = 0.404686 ha
+                    break;
+                case 'ft2':
+                    fieldSizeHa = fieldSize * 0.0000929; // 1 ft² = 0.0000929 ha
+                    break;
+            }
+            
+            // Convert application rate to a common unit (L or kg)
+            let productAmountPerHa = applicationRate;
+            switch (rateUnit) {
+                case 'ml_ha':
+                    productAmountPerHa = applicationRate / 1000; // convert ml to L
+                    break;
+                case 'g_ha':
+                    productAmountPerHa = applicationRate / 1000; // convert g to kg
+                    break;
+            }
+            
+            // Calculate product amount
+            productAmount = productAmountPerHa * fieldSizeHa;
+            
+            // Calculate water amount based on spraying volume
+            waterAmount = sprayingVolume * fieldSizeHa;
+            
+        } else { // concentration method
+            const targetConcentration = parseFloat(document.getElementById('targetConcentration').value);
+            const concentrationUnit = document.getElementById('concentrationUnit').value;
+            const productConcentration = parseFloat(document.getElementById('productConcentration').value);
+            const totalSolutionVolume = parseFloat(document.getElementById('totalSolutionVolume').value);
+            const volumeUnit = document.getElementById('volumeUnit').value;
+            
+            if (isNaN(targetConcentration) || isNaN(productConcentration) || isNaN(totalSolutionVolume) || 
+                targetConcentration <= 0 || productConcentration <= 0 || totalSolutionVolume <= 0 || 
+                productConcentration > 100) {
+                alert('Please enter valid values for all fields. Product concentration must be between 0 and 100%.');
+                return;
+            }
+            
+            // Convert volume to liters
+            let totalVolumeLiters = totalSolutionVolume;
+            if (volumeUnit === 'gal') {
+                totalVolumeLiters = totalSolutionVolume * 3.78541; // 1 gal = 3.78541 L
+            }
+            
+            // Convert target concentration to a common unit (% concentration)
+            let targetConcentrationPercent = targetConcentration;
+            switch (concentrationUnit) {
+                case 'ppm':
+                    targetConcentrationPercent = targetConcentration / 10000; // 1 ppm = 0.0001%
+                    break;
+                case 'g_l':
+                    targetConcentrationPercent = (targetConcentration / 10); // approximation assuming density ~1kg/L
+                    break;
+                case 'ml_l':
+                    targetConcentrationPercent = targetConcentration / 10; // approximation assuming density ~1kg/L
+                    break;
+            }
+            
+            // Calculate product amount (active ingredient needed / concentration of product)
+            const activeIngredientNeeded = totalVolumeLiters * (targetConcentrationPercent / 100);
+            productAmount = activeIngredientNeeded / (productConcentration / 100);
+            
+            // Water amount is the remaining volume
+            waterAmount = totalVolumeLiters - productAmount;
+            
+            // For very dilute solutions, use more precise calculation
+            if (targetConcentrationPercent < 0.1) {
+                productAmount = totalVolumeLiters * (targetConcentrationPercent / productConcentration);
+                waterAmount = totalVolumeLiters - productAmount;
+            }
+        }
+        
+        // Calculate total spray solution
+        const totalSpray = productAmount + waterAmount;
+        
+        // Calculate number of tank loads (assuming 200L standard tank)
+        const tankSize = 200; // liters
+        const tankLoads = Math.ceil(totalSpray / tankSize);
+        
+        // Determine units based on the amount
+        let productUnit, waterUnit, totalUnit;
+        
+        if (productAmount < 1) {
+            productAmount = productAmount * 1000; // convert to ml
+            productUnit = 'ml';
+        } else {
+            productUnit = 'L';
+        }
+        
+        if (waterAmount >= 1000) {
+            waterAmount = waterAmount / 1000; // convert to m³
+            waterUnit = 'm³';
+        } else {
+            waterUnit = 'L';
+        }
+        
+        if (totalSpray >= 1000) {
+            totalSpray = totalSpray / 1000; // convert to m³
+            totalUnit = 'm³';
+        } else {
+            totalUnit = 'L';
+        }
+        
+        // Display results
+        document.getElementById('productAmount').textContent = `${productAmount.toFixed(2)} ${productUnit}`;
+        document.getElementById('waterAmount').textContent = `${waterAmount.toFixed(2)} ${waterUnit}`;
+        document.getElementById('totalSprayAmount').textContent = `${totalSpray.toFixed(2)} ${totalUnit}`;
+        document.getElementById('tankLoads').textContent = tankLoads;
+        document.getElementById('pesticideResult').classList.remove('d-none');
+    });
+    
+    // Livestock Feed Calculator Logic
+    const animalType = document.getElementById('animalType');
+    const customAnimalInputs = document.getElementById('customAnimalInputs');
+    
+    animalType.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customAnimalInputs.classList.remove('d-none');
+        } else {
+            customAnimalInputs.classList.add('d-none');
+        }
+    });
+    
+    document.getElementById('calculateFeed').addEventListener('click', function() {
+        const animal = animalType.value;
+        const animalWeightInput = parseFloat(document.getElementById('animalWeight').value);
+        const weightUnit = document.getElementById('weightUnit').value;
+        const animalCount = parseInt(document.getElementById('animalCount').value);
+        const productionStage = document.getElementById('productionStage').value;
+        const feedingPeriod = parseInt(document.getElementById('feedingPeriod').value);
+        const feedMoisture = parseFloat(document.getElementById('feedMoisture').value);
+        
+        if (isNaN(animalWeightInput) || isNaN(animalCount) || isNaN(feedingPeriod) || isNaN(feedMoisture) ||
+            animalWeightInput <= 0 || animalCount <= 0 || feedingPeriod <= 0 || 
+            feedMoisture < 0 || feedMoisture >= 100) {
+            alert('Please enter valid values for all fields.');
+            return;
+        }
+        
+        // Convert weight to kg if needed
+        const animalWeight = weightUnit === 'lb' ? animalWeightInput * 0.453592 : animalWeightInput;
+        
+        // Dry matter intake as percentage of body weight for different animals
+        const baseDMIPercentages = {
+            'dairy-cow': 3.0,
+            'beef-cattle': 2.5,
+            'sheep': 3.0,
+            'goat': 3.2,
+            'pig': 3.5,
+            'poultry': 5.0,
+            'horse': 2.0,
+            'custom': parseFloat(document.getElementById('customDMIPercentage').value) || 2.5
+        };
+        
+        // Production stage adjustment factors
+        const stageFactors = {
+            'maintenance': 0.8,
+            'growth': 1.0,
+            'late-pregnancy': 1.1,
+            'early-lactation': 1.3,
+            'peak-production': 1.5
+        };
+        
+        // If custom animal is selected but no DMI is provided
+        if (animal === 'custom' && 
+            (isNaN(parseFloat(document.getElementById('customDMIPercentage').value)) || 
+            parseFloat(document.getElementById('customDMIPercentage').value) <= 0)) {
+            alert('Please enter a valid dry matter intake percentage for your custom animal.');
+            return;
+        }
+        
+        // Calculate base dry matter intake (DMI) in kg per day
+        const baseDMI = animalWeight * (baseDMIPercentages[animal] / 100);
+        
+        // Adjust for production stage
+        const adjustedDMI = baseDMI * stageFactors[productionStage];
+        
+        // Convert from dry matter to as-fed basis
+        const asFedFactor = 100 / (100 - feedMoisture); // convert from DM to as-fed
+        const dailyFeedPerAnimal = adjustedDMI * asFedFactor;
+        
+        // Calculate for the herd/flock
+        const dailyFeedTotal = dailyFeedPerAnimal * animalCount;
+        const totalFeedRequired = dailyFeedTotal * feedingPeriod;
+        
+        // Approximate protein and energy requirements
+        // Crude protein as percentage of DMI
+        const proteinPercentages = {
+            'dairy-cow': productionStage === 'peak-production' ? 18 : 14,
+            'beef-cattle': productionStage === 'growth' ? 14 : 10,
+            'sheep': productionStage === 'early-lactation' ? 16 : 12,
+            'goat': productionStage === 'early-lactation' ? 16 : 12,
+            'pig': 16,
+            'poultry': 18,
+            'horse': 12,
+            'custom': 14 // default for custom
+        };
+        
+        // Energy requirements in MJ per kg DMI
+        const energyPerKgDM = {
+            'dairy-cow': 11,
+            'beef-cattle': 10,
+            'sheep': 11,
+            'goat': 11,
+            'pig': 14,
+            'poultry': 13,
+            'horse': 9,
+            'custom': 10 // default for custom
+        };
+        
+        const proteinNeeded = (adjustedDMI * animalCount * proteinPercentages[animal]) / 100;
+        const energyNeeded = adjustedDMI * animalCount * energyPerKgDM[animal];
+        
+        // Display results
+        document.getElementById('dailyFeedPerAnimal').textContent = dailyFeedPerAnimal.toFixed(2);
+        document.getElementById('dailyFeedTotal').textContent = dailyFeedTotal.toFixed(2);
+        document.getElementById('totalFeedRequired').textContent = totalFeedRequired.toFixed(2);
+        document.getElementById('dryMatterPerDay').textContent = (adjustedDMI * animalCount).toFixed(2);
+        document.getElementById('proteinNeeded').textContent = proteinNeeded.toFixed(2);
+        document.getElementById('energyNeeded').textContent = energyNeeded.toFixed(2);
+        document.getElementById('feedResult').classList.remove('d-none');
+    });
+    
+    // Greenhouse Heating/Cooling Calculator
+    const calculationType = document.getElementById('calculationType');
+    const greenhouseResultTitle = document.getElementById('greenhouseResultTitle');
+    const heatingRequirementRow = document.getElementById('heatingRequirementRow');
+    const coolingRequirementRow = document.getElementById('coolingRequirementRow');
+    
+    calculationType.addEventListener('change', function() {
+        if (this.value === 'heating') {
+            greenhouseResultTitle.textContent = 'Greenhouse Heating Results';
+            heatingRequirementRow.classList.remove('d-none');
+            coolingRequirementRow.classList.add('d-none');
+        } else {
+            greenhouseResultTitle.textContent = 'Greenhouse Cooling Results';
+            heatingRequirementRow.classList.add('d-none');
+            coolingRequirementRow.classList.remove('d-none');
+        }
+    });
+    
+    document.getElementById('calculateGreenhouse').addEventListener('click', function() {
+        const calcType = calculationType.value;
+        
+        // Get dimensions
+        const lengthInput = parseFloat(document.getElementById('greenhouseLength').value);
+        const lengthUnit = document.getElementById('lengthUnit').value;
+        const widthInput = parseFloat(document.getElementById('greenhouseWidth').value);
+        const widthUnit = document.getElementById('widthUnit').value;
+        const heightInput = parseFloat(document.getElementById('sidewallHeight').value);
+        const heightUnit = document.getElementById('heightUnit').value;
+        
+        // Convert to meters if needed
+        const length = lengthUnit === 'ft' ? lengthInput * 0.3048 : lengthInput;
+        const width = widthUnit === 'ft' ? widthInput * 0.3048 : widthInput;
+        const height = heightUnit === 'ft' ? heightInput * 0.3048 : heightInput;
+        
+        if (isNaN(length) || isNaN(width) || isNaN(height) || length <= 0 || width <= 0 || height <= 0) {
+            alert('Please enter valid positive values for all dimensions.');
+            return;
+        }
+        
+        const roofType = document.getElementById('roofType').value;
+        const coveringType = document.getElementById('coveringType').value;
+        
+        // Get temperatures
+        const insideTempInput = parseFloat(document.getElementById('insideTemp').value);
+        const insideTempUnit = document.getElementById('tempUnit').value;
+        const outsideTempInput = parseFloat(document.getElementById('outsideTemp').value);
+        const outsideTempUnit = document.getElementById('outsideTempUnit').value;
+        
+        // Convert to Celsius if needed
+        const insideTemp = insideTempUnit === 'f' ? (insideTempInput - 32) * 5/9 : insideTempInput;
+        const outsideTemp = outsideTempUnit === 'f' ? (outsideTempInput - 32) * 5/9 : outsideTempInput;
+        
+        if (isNaN(insideTemp) || isNaN(outsideTemp)) {
+            alert('Please enter valid temperature values.');
+            return;
+        }
+        
+        // Get wind speed
+        const windSpeedInput = parseFloat(document.getElementById('windSpeed').value);
+        const windUnit = document.getElementById('windUnit').value;
+        
+        // Convert to km/h if needed
+        const windSpeed = windUnit === 'mph' ? windSpeedInput * 1.60934 : windSpeedInput;
+        
+        if (isNaN(windSpeed) || windSpeed < 0) {
+            alert('Please enter a valid wind speed.');
+            return;
+        }
+        
+        // Calculate total surface area
+        let surfaceArea = 0;
+        const floorArea = length * width;
+        const sidewallArea = 2 * (length + width) * height;
+        
+        // Roof area based on type
+        let roofArea = 0;
+        switch (roofType) {
+            case 'gothic':
+                // Assume peaked roof with 30° pitch
+                const peakHeight = width * 0.289; // tan(30°) * (width/2)
+                roofArea = 2 * length * Math.sqrt(Math.pow(width/2, 2) + Math.pow(peakHeight, 2));
+                break;
+            case 'quonset':
+                // Approximate half-cylinder surface
+                roofArea = Math.PI * width * length / 2;
+                break;
+            case 'flat':
+                roofArea = floorArea;
+                break;
+        }
+        
+        surfaceArea = sidewallArea + roofArea;
+        
+        // Calculate volume
+        let volume = 0;
+        
+        switch (roofType) {
+            case 'gothic':
+                // Base volume + triangular prism volume
+                const peakHeight = width * 0.289; // tan(30°) * (width/2)
+                volume = floorArea * height + (floorArea * peakHeight / 2);
+                break;
+            case 'quonset':
+                // Approximate half-cylinder volume + rectangular base
+                volume = floorArea * height + (Math.PI * Math.pow(width/2, 2) * length / 2);
+                break;
+            case 'flat':
+                volume = floorArea * height;
+                break;
+        }
+        
+        // U-values (heat transfer coefficients) for different covering materials (W/m²K)
+        const uValues = {
+            'single-poly': 6.2,
+            'double-poly': 4.0,
+            'polycarbonate': 3.5,
+            'glass': 5.7
+        };
+        
+        // Wind adjustment factor
+        const windFactor = 1 + (windSpeed / 50);
+        
+        // Temperature difference
+        const tempDifference = Math.abs(insideTemp - outsideTemp);
+        
+        // Calculate requirement in kilowatts
+        let requirementKW = 0;
+        
+        if (calcType === 'heating') {
+            // For heating, we need the adjusted U-value * surface area * temperature difference
+            requirementKW = (uValues[coveringType] * windFactor * surfaceArea * tempDifference) / 1000;
+        } else {
+            // For cooling, consider solar gain in addition to conduction
+            // Solar gain factors by covering type (W/m²)
+            const solarGainFactors = {
+                'single-poly': 300,
+                'double-poly': 250,
+                'polycarbonate': 220,
+                'glass': 350
+            };
+            
+            // Solar gain through roof
+            const solarGain = solarGainFactors[coveringType] * roofArea / 1000;
+            
+            // Conduction gain
+            const conductionGain = (uValues[coveringType] * surfaceArea * tempDifference) / 1000;
+            
+            // Total cooling requirement
+            requirementKW = conductionGain + solarGain;
+        }
+        
+        // Convert kW to BTU/hr (1 kW = 3412.14 BTU/hr)
+        const requirementBTU = requirementKW * 3412.14;
+        
+        // Display results
+        document.getElementById('surfaceArea').textContent = surfaceArea.toFixed(2);
+        document.getElementById('greenhouseVolume').textContent = volume.toFixed(2);
+        
+        if (calcType === 'heating') {
+            document.getElementById('heatingRequirement').textContent = requirementKW.toFixed(2);
+        } else {
+            document.getElementById('coolingRequirement').textContent = requirementKW.toFixed(2);
+        }
+        
+        document.getElementById('btuRequirement').textContent = Math.round(requirementBTU).toLocaleString();
+        document.getElementById('greenhouseResult').classList.remove('d-none');
+    });
+    
+    // Farm Machinery Cost Calculator
+    document.getElementById('salvageValue').addEventListener('input', function() {
+        // If user manually enters a salvage value, clear the percentage
+        if (this.value !== '') {
+            document.getElementById('salvagePercent').value = '';
+        }
+    });
+    
+    document.getElementById('salvagePercent').addEventListener('input', function() {
+        // If user enters a percentage, clear the fixed value
+        if (this.value !== '') {
+            document.getElementById('salvageValue').value = '';
+        }
+    });
+    
+    document.getElementById('calculateMachinery').addEventListener('click', function() {
+        const machineType = document.getElementById('machineType').value;
+        const purchasePrice = parseFloat(document.getElementById('purchasePrice').value);
+        const salvageValueInput = document.getElementById('salvageValue').value;
+        const salvagePercentInput = document.getElementById('salvagePercent').value;
+        const usefulLife = parseInt(document.getElementById('usefulLife').value);
+        const annualUsage = parseInt(document.getElementById('annualUsage').value);
+        const interestRate = parseFloat(document.getElementById('interestRate').value);
+        const fuelConsumption = parseFloat(document.getElementById('fuelConsumption').value);
+        const fuelPrice = parseFloat(document.getElementById('fuelPrice').value);
+        const maintenancePercent = parseFloat(document.getElementById('maintenancePercent').value);
+        
+        // Validate inputs
+        if (isNaN(purchasePrice) || purchasePrice <= 0) {
+            alert('Please enter a valid purchase price.');
+            return;
+        }
+        
+        if (isNaN(usefulLife) || usefulLife <= 0) {
+            alert('Please enter a valid useful life.');
+            return;
+        }
+        
+        if (isNaN(annualUsage) || annualUsage <= 0) {
+            alert('Please enter valid annual usage hours.');
+            return;
+        }
+        
+        if (isNaN(interestRate) || interestRate < 0) {
+            alert('Please enter a valid interest rate.');
+            return;
+        }
+        
+        if (isNaN(fuelConsumption) || fuelConsumption < 0 || isNaN(fuelPrice) || fuelPrice < 0) {
+            alert('Please enter valid fuel consumption and price.');
+            return;
+        }
+        
+        if (isNaN(maintenancePercent) || maintenancePercent < 0) {
+            alert('Please enter a valid maintenance percentage.');
+            return;
+        }
+        
+        // Determine salvage value
+        let salvageValue;
+        if (salvageValueInput !== '' && !isNaN(parseFloat(salvageValueInput))) {
+            salvageValue = parseFloat(salvageValueInput);
+        } else if (salvagePercentInput !== '' && !isNaN(parseFloat(salvagePercentInput))) {
+            salvageValue = purchasePrice * (parseFloat(salvagePercentInput) / 100);
+        } else {
+            // Default to 30% if neither provided
+            salvageValue = purchasePrice * 0.3;
+        }
+        
+        // Calculate depreciation (straight-line method)
+        const annualDepreciation = (purchasePrice - salvageValue) / usefulLife;
+        
+        // Calculate average investment
+        const averageInvestment = (purchasePrice + salvageValue) / 2;
+        
+        // Calculate annual interest cost
+        const annualInterest = averageInvestment * (interestRate / 100);
+        
+        // Calculate annual fuel cost
+        const annualFuel = fuelConsumption * fuelPrice * annualUsage;
+        
+        // Calculate annual maintenance cost
+        const annualMaintenance = purchasePrice * (maintenancePercent / 100);
+        
+        // Calculate totals
+        const totalFixedCosts = annualDepreciation + annualInterest;
+        const totalVariableCosts = annualFuel + annualMaintenance;
+        const annualTotal = totalFixedCosts + totalVariableCosts;
+        const hourlyRate = annualTotal / annualUsage;
+        
+        // Display results
+        document.getElementById('depreciationCost').textContent = annualDepreciation.toFixed(2);
+        document.getElementById('interestCost').textContent = annualInterest.toFixed(2);
+        document.getElementById('totalFixedCosts').textContent = totalFixedCosts.toFixed(2);
+        document.getElementById('fuelCost').textContent = annualFuel.toFixed(2);
+        document.getElementById('maintenanceCost').textContent = annualMaintenance.toFixed(2);
+        document.getElementById('totalVariableCosts').textContent = totalVariableCosts.toFixed(2);
+        document.getElementById('annualTotalCost').textContent = annualTotal.toFixed(2);
+        document.getElementById('hourlyRate').textContent = hourlyRate.toFixed(2);
+        document.getElementById('machineryResult').classList.remove('d-none');
+    });
+});
+</script>
+{% endblock %}

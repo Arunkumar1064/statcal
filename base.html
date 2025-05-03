@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agricultural Calculator</title>
+    <!-- Bootstrap 5 CSS (Replit-themed) -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-tractor me-2"></i>Agricultural Calculator
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/land_area"><i class="fas fa-ruler me-1"></i>Land & Area</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/soil_fertilizer"><i class="fas fa-seedling me-1"></i>Soil & Fertilizer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/water_irrigation"><i class="fas fa-water me-1"></i>Water & Irrigation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/seed_planting"><i class="fas fa-leaf me-1"></i>Seed & Planting</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/crop_yield"><i class="fas fa-balance-scale me-1"></i>Crop Yield & Profit</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/additional"><i class="fas fa-plus-circle me-1"></i>Additional Calculators</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-dark text-light py-3 mt-5">
+        <div class="container text-center">
+            
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Math.js for complex calculations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <!-- Custom Calculator Scripts -->
+    <script src="{{ url_for('static', filename='js/calculators.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
